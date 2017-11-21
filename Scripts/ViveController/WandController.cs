@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class WandController : MonoBehaviour {
+public class WandController : Owner {
     private Valve.VR.EVRButtonId triggerButton = Valve.VR.EVRButtonId.k_EButton_SteamVR_Trigger;
     private Valve.VR.EVRButtonId touchpadButton = Valve.VR.EVRButtonId.k_EButton_SteamVR_Touchpad;
 
@@ -10,16 +10,19 @@ public class WandController : MonoBehaviour {
     private SteamVR_TrackedObject trackedObject;
 
     private HashSet<GameObject> hoveredInteractables = new HashSet<GameObject>();
-    public FixedJoint fixedJoint;
+    
 
-    [SerializeField]
     private GameObject closestItem;
 
-    private bool throwing;
-    private GameObject heldItem;
+    [SerializeField]
+    private ContainerController container;
+
+    private FixedJoint fixedJoint;
+
     private Material supermarketMaterial;
     private Material highlightedMaterial;
 
+    
     public Transform origin { get { return trackedObject.origin; } }
     public Vector3 angularVelocity { get { return controller.angularVelocity; } }
     public Vector3 velocity { get { return controller.velocity; } }
@@ -54,7 +57,7 @@ public class WandController : MonoBehaviour {
                 highlightedMaterial.shader = Shader.Find("Custom/OnHoverOutline");
             }
 
-            if (lastClosestItem)
+            if (lastClosestItem && lastClosestItem.layer == LayerMask.NameToLayer("Grabbable"))
             {
                 lastClosestItem.GetComponent<Renderer>().material = supermarketMaterial;
             }
@@ -78,7 +81,7 @@ public class WandController : MonoBehaviour {
             return;
         }
 
-        if (heldItem == null)
+        if (ownedItem == null)
         {
             SetClosestItem();
         }
@@ -94,9 +97,16 @@ public class WandController : MonoBehaviour {
 
         if (controller.GetPressUp(triggerButton))
         {
-            if (heldItem)
+            if (ownedItem)
             {
-                ReleaseObject();
+                if (container && !container.OwnsItem())
+                {
+                    GiveToContainer();
+                }
+                else
+                {
+                    ThrowObject();
+                }
             }
         }
     }
@@ -107,6 +117,10 @@ public class WandController : MonoBehaviour {
         {
             hoveredInteractables.Add(other.gameObject);
         }
+        else if (other.gameObject.layer == LayerMask.NameToLayer("Inventory"))
+        {
+            container = other.GetComponent<ContainerController>();
+        }
     }
 
     private void OnTriggerExit(Collider other)
@@ -115,32 +129,44 @@ public class WandController : MonoBehaviour {
         {
             hoveredInteractables.Remove(other.gameObject);
         }
+        else if (other.gameObject.layer == LayerMask.NameToLayer("Inventory"))
+        {
+            container = null;
+        }
     }
 
     private void GrabObject(GameObject gameObject)
     {
-        heldItem = gameObject;
-        heldItem.GetComponent<Renderer>().material = supermarketMaterial;
+        if (ownedItem)
+        {
+            ownedItem.GetComponent<Renderer>().material = supermarketMaterial;
+        }
 
         InteractionController itemController = gameObject.GetComponent<InteractionController>();
         if (itemController == null)
         {
             itemController = gameObject.AddComponent<InteractionController>();
         }
-
-        itemController.GrabObject(this);
+        ownedItem = itemController;
         fixedJoint.connectedBody = gameObject.GetComponent<Rigidbody>();
     }
 
-    private void ReleaseObject()
+    private void GiveToContainer()
     {
-        heldItem.GetComponent<InteractionController>().ReleaseObject();
-        GiveUpObject();
+        GiveItem(container);
+    }
+     
+    private void ThrowObject()
+    {
+        ownedItem.GetComponent<InteractionController>().ThrowObject();
     }
 
-    public void GiveUpObject()
+    public override void GiveUpObject(Property item)
     {
-        fixedJoint.connectedBody = null;
-        heldItem = null;
+        if (ownedItem == item)
+        {
+            fixedJoint.connectedBody = null;
+            base.GiveUpObject(item);
+        }
     }
 }
