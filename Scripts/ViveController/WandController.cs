@@ -142,12 +142,12 @@ public class WandController : Owner {
             ownedItem.GetComponent<Renderer>().material = supermarketMaterial;
         }
 
-        InteractionController itemController = gameObject.GetComponent<InteractionController>();
-        if (itemController == null)
+        Throwable item = gameObject.GetComponent<Throwable>();
+        if (item == null)
         {
-            itemController = gameObject.AddComponent<InteractionController>();
+            item = gameObject.AddComponent<Throwable>();
         }
-        ownedItem = itemController;
+        ownedItem = item;
         fixedJoint.connectedBody = gameObject.GetComponent<Rigidbody>();
     }
 
@@ -158,7 +158,7 @@ public class WandController : Owner {
      
     private void ThrowObject()
     {
-        ownedItem.GetComponent<InteractionController>().ThrowObject();
+        ownedItem.GetComponent<Throwable>().ThrowObject();
     }
 
     public override void GiveUpObject(Property item)
