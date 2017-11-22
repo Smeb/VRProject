@@ -12,7 +12,6 @@ public class Throwable : Property {
 
     private void FixedUpdate()
     {
-
         if (throwing)
         {
             Rigidbody rigidbody = rigidbody = gameObject.GetComponent<Rigidbody>();
