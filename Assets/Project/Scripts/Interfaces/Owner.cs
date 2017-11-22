@@ -21,7 +21,7 @@ public abstract class Owner : MonoBehaviour
         }
     }
 
-    public virtual void TakeOwnership(Property item)
+    protected virtual void TakeOwnership(Property item)
     {
         ownedItem = item;
     }

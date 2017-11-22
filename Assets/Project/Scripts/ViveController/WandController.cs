@@ -57,7 +57,7 @@ public class WandController : Owner {
                 highlightedMaterial.shader = Shader.Find("Custom/OnHoverOutline");
             }
 
-            if (lastClosestItem && lastClosestItem.layer == LayerMask.NameToLayer("Grabbable"))
+            if (lastClosestItem)
             {
                 lastClosestItem.GetComponent<Renderer>().material = supermarketMaterial;
             }
@@ -101,7 +101,7 @@ public class WandController : Owner {
             {
                 if (container && !container.OwnsItem())
                 {
-                    GiveToContainer();
+                    GiveItem(container);
                 }
                 else
                 {
@@ -137,11 +137,6 @@ public class WandController : Owner {
 
     private void GrabObject(GameObject gameObject)
     {
-        if (ownedItem)
-        {
-            ownedItem.GetComponent<Renderer>().material = supermarketMaterial;
-        }
-
         Throwable item = gameObject.GetComponent<Throwable>();
         if (item == null)
         {
@@ -149,11 +144,6 @@ public class WandController : Owner {
         }
         ownedItem = item;
         fixedJoint.connectedBody = gameObject.GetComponent<Rigidbody>();
-    }
-
-    private void GiveToContainer()
-    {
-        GiveItem(container);
     }
      
     private void ThrowObject()
