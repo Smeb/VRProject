@@ -1,0 +1,12 @@
+List of unique items
+
+Code | Description
+
+49 | Apple Juice
+50 | Cookies
+51 | Tee
+52 | Milk
+53 | Kefir
+54 | Winen
+55 | Mozarella pizza
+56 | Generic cardboard

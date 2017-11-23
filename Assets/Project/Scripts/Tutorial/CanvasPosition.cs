@@ -50,6 +50,5 @@ public class CanvasPosition : MonoBehaviour {
 		} else {
 			dialogueBox.SetActive (true);
 		}
-
 	}
 }
