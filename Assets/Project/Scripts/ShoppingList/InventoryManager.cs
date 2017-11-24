@@ -66,7 +66,7 @@ public class IconMap :MonoBehaviour  {
 
 	private Dictionary<int, Sprite> iconDict; 
 
-	private string folderPath = "Assets/Project/UniqueItemSprites/";
+	private string folderPath = "Assets/Project/Sprites/UniqueItemSprites/";
 
 	public IconMap () {
 
