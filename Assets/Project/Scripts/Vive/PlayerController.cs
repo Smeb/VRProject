@@ -22,7 +22,7 @@ public class PlayerController : MonoBehaviour
                 }
                 m_activeState = value;
                 m_activeState.SetActive(true);
-                m_activeState.UpdateCamera(cameraRig);
+                m_activeState.UpdateCamera();
             }
         }
     }
@@ -30,8 +30,8 @@ public class PlayerController : MonoBehaviour
 
     void Start()
     {
-        humanState = new HumanState(humanReferencePosition, supermarketFloor, new Vector3(1, 1, 1));
-        godState = new GodState(godReferencePosition, sceneFloor, new Vector3(30, 30, 30));
+        humanState = new HumanState(cameraRig, humanReferencePosition, supermarketFloor, new Vector3(1, 1, 1));
+        godState = new GodState(cameraRig, godReferencePosition, sceneFloor, new Vector3(30, 30, 30));
         activeState = humanState;
     }
 
@@ -58,22 +58,26 @@ public class PlayerController : MonoBehaviour
 
     public class GodState : CameraState
     {
-        public override void UpdateCamera(GameObject cameraRig)
+        public override void UpdateCamera()
         {
-            SetCameraTransform(cameraRig, this.position, cameraRig.transform.rotation, this.scale);
+            SetCameraTransform(this.position, cameraRig.transform.rotation, this.scale);
         }
 
-        public GodState(GameObject referenceObject, GameObject referenceFloor, Vector3 scale) : base(referenceObject, referenceFloor, scale) {}
+        public GodState(GameObject cameraRig, GameObject referenceObject, GameObject referenceFloor, Vector3 scale)
+            : base(cameraRig, referenceObject, referenceFloor, scale) {}
     }
 
     public class HumanState : CameraState
     {
-        public override void UpdateCamera(GameObject cameraRig)
+        public override Vector3 position
         {
-            Camera camera = cameraRig.GetComponent<Camera>();
-            camera.transform.position = this.position;
-            camera.transform.rotation = this.rotation;
-            cameraRig.transform.localScale = this.scale;
+            get
+            {
+                Vector3 position = base.position;
+                Vector3 cameraOffset = cameraRig.GetComponentInChildren<Camera>().transform.localPosition;
+                cameraOffset.y = 0;
+                return position - cameraOffset;
+            }
         }
 
         public override void SetActive(bool active)
@@ -82,7 +86,8 @@ public class PlayerController : MonoBehaviour
             base.SetActive(active);
         }
 
-        public HumanState(GameObject referenceObject, GameObject referenceFloor, Vector3 scale) : base(referenceObject, referenceFloor, scale)
+        public HumanState(GameObject cameraRig, GameObject referenceObject, GameObject referenceFloor, Vector3 scale)
+            : base(cameraRig, referenceObject, referenceFloor, scale)
         {
             if (referenceObject.GetComponent<PlayerPositionValidator>())
             {
@@ -91,12 +96,11 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-
-
-    public abstract class CameraState : Location
+    public class CameraState : Location
     {
         public GameObject referenceObject;
         public GameObject referenceFloor;
+        public GameObject cameraRig;
 
         public Vector3 scale;
         public bool active;
@@ -118,8 +122,9 @@ public class PlayerController : MonoBehaviour
             get { return referenceObject.transform.rotation; }
         }
 
-        public CameraState(GameObject referenceObject, GameObject referenceFloor, Vector3 scale)
+        public CameraState(GameObject cameraRig, GameObject referenceObject, GameObject referenceFloor, Vector3 scale)
         {
+            this.cameraRig = cameraRig;
             this.referenceObject = referenceObject;
             this.referenceFloor = referenceFloor;
             this.scale = scale;
@@ -130,12 +135,12 @@ public class PlayerController : MonoBehaviour
             this.active = active;
         }
 
-        public virtual void UpdateCamera (GameObject cameraRig)
+        public virtual void UpdateCamera()
         {
-            SetCameraTransform(cameraRig, this.position, this.rotation, this.scale);
+            SetCameraTransform(this.position, this.rotation, this.scale);
         }
 
-        protected void SetCameraTransform (GameObject cameraRig, Vector3 position, Quaternion rotation, Vector3 scale)
+        protected void SetCameraTransform (Vector3 position, Quaternion rotation, Vector3 scale)
         {
             cameraRig.transform.position = this.position;
             cameraRig.transform.rotation = this.rotation;
