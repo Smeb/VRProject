@@ -27,6 +27,18 @@ public class WandController : Owner {
     public Vector3 angularVelocity { get { return controller.angularVelocity; } }
     public Vector3 velocity { get { return controller.velocity; } }
 
+    private CameraState m_state;
+    public CameraState state { 
+        set {
+            SphereCollider collider = this.GetComponent<SphereCollider>();
+            collider.transform.localScale /= m_state.scale;
+            m_state = value;
+            collider.transform.localScale *= m_state.scale;
+        } 
+    }
+
+    private 
+
 	// Use this for initialization
 	void Start () {
         playerController = GetComponentInParent<PlayerController>();
