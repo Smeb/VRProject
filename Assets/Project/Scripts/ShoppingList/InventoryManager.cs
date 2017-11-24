@@ -9,14 +9,14 @@ public class InventoryManager : MonoBehaviour {
 
 	public Transform itemsParent;
 
+
 	public InventorySlot[] slots;
-
 	public int itemCount;
-
 	public IconMap iconMap;
-
 	public GameObject BGPanel;
 	public bool active;
+
+	public ItemChecker itemChecker; 
 
 	void Start () {
 		slots = this.GetComponentsInChildren<InventorySlot> ();
@@ -25,6 +25,10 @@ public class InventoryManager : MonoBehaviour {
 
 		//		BGPanel.SetActive (false);
 		//		active = false;
+
+		int[] itemsToCheck = { 55, 55, 55 };
+		itemChecker = new ItemChecker (itemsToCheck);
+
 
 	}
 
@@ -52,12 +56,58 @@ public class InventoryManager : MonoBehaviour {
 			print ("free slot");
 			Sprite spriteIcon = iconMap.GetIconPath (code.Code);
 			slots [itemCount].AddItem (spriteIcon);
+
+			if (itemChecker.isTickable (code.Code)) {
+				print ("activating tick"); 
+				slots [itemCount].activateTick (); 
+			}
+
+
 			itemCount++;
+
+
+
 		} else {
 			print ("ERROR, out of space in invent?"); 
 		}
 
 	}
+
+}
+
+
+public class ItemChecker{
+
+	private Dictionary<int, int> itemCollection;
+
+	public ItemChecker(int[] itemsToCollect){
+
+
+		for (int i = 0; i < itemsToCollect.Length; i++){
+
+			bool hasKey = itemCollection.ContainsKey (itemCollection [i]);
+
+			int existingCount = hasKey ? itemCollection[itemsToCollect[i]] : 0; 
+
+			itemCollection.Add (itemsToCollect [i], ++existingCount ); 
+		}
+			
+
+	}
+
+	public bool isTickable(int productCode){
+
+		int existingValue = this.itemCollection [productCode];
+
+		if (existingValue > 0) {
+			itemCollection [productCode] = --existingValue;
+			return true;
+		} else {
+			return false; 
+		}
+
+	}
+		
 
 }
 
@@ -82,8 +132,8 @@ public class IconMap :MonoBehaviour  {
 
 	public Sprite GetIconPath(int productCode){
 
-		return this.iconDict [55 ];
-		//return this.iconTable [productCode]; 
+		//return this.iconDict [55 ];
+		return this.iconDict [productCode]; 
 	}
 
 

@@ -24,6 +24,7 @@ public class MockInteraction : MonoBehaviour {
 				inventoryManager.addItem (draggingItem.dragging);
 
 
+
 			}
 		}	
 	}
