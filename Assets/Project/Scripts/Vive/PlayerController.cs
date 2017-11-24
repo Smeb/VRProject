@@ -2,75 +2,150 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerController : MonoBehaviour {
+public class PlayerController : MonoBehaviour
+{
     public GameObject cameraRig;
 
-    public GameObject godPosition, humanPosition;
-    StateData godState, humanState;
+    public GameObject humanReferencePosition, godReferencePosition, sceneFloor, supermarketFloor;
 
-
-    // Use this for initialization
-
-    void Start () {
-        humanState = new StateData(humanPosition, true);
-        godState = new StateData(godPosition, false);
-        UpdateCamera(humanState);
-    }
-	
-	// Update is called once per frame
-	void Update () {
-        		
-	}
-
-    private void UpdateCamera(StateData state)
+    private CameraState m_activeState;
+    private CameraState activeState
     {
-        cameraRig.transform.position = state.positionObject.transform.position;
-        cameraRig.transform.rotation = state.positionObject.transform.rotation;
-        cameraRig.transform.localScale = state.positionObject.transform.localScale;
+        get { return m_activeState; }
+        set
+        {
+            if (m_activeState != value)
+            {
+                if (m_activeState != null)
+                {
+                    m_activeState.SetActive(false);
+                }
+                m_activeState = value;
+                m_activeState.SetActive(true);
+                m_activeState.UpdateCamera(cameraRig);
+            }
+        }
+    }
+    private CameraState humanState, godState;
+
+    void Start()
+    {
+        humanState = new HumanState(humanReferencePosition, supermarketFloor, new Vector3(1, 1, 1));
+        godState = new GodState(godReferencePosition, sceneFloor, new Vector3(30, 30, 30));
+        activeState = humanState;
+    }
+
+    void Update()
+    {
+        if (Input.GetKeyDown("space"))
+        {
+            ToggleViewpoint();
+        }
     }
 
     public void ToggleViewpoint()
     {
-        if (humanState.active)
+        if (activeState == humanState)
         {
-            humanState.SetActive(cameraRig, true);
-            godState.SetActive(cameraRig, false);
-            UpdateCamera(godState);
+            activeState = godState;
         }
         else
         {
-            humanState.SetActive(cameraRig, false);
-            godState.SetActive(cameraRig, true);
-            godState.UpdateMetaphorPosition(cameraRig);
+            activeState = humanState;
+        }
+        Debug.Log(activeState);
+    }
 
-            UpdateCamera(humanState);
+    public class GodState : CameraState
+    {
+        public override void UpdateCamera(GameObject cameraRig)
+        {
+            SetCameraTransform(cameraRig, this.position, cameraRig.transform.rotation, this.scale);
+        }
+
+        public GodState(GameObject referenceObject, GameObject referenceFloor, Vector3 scale) : base(referenceObject, referenceFloor, scale) {}
+    }
+
+    public class HumanState : CameraState
+    {
+        public override void UpdateCamera(GameObject cameraRig)
+        {
+            Camera camera = cameraRig.GetComponent<Camera>();
+            camera.transform.position = this.position;
+            camera.transform.rotation = this.rotation;
+            cameraRig.transform.localScale = this.scale;
+        }
+
+        public override void SetActive(bool active)
+        {
+            referenceObject.GetComponent<Renderer>().enabled = !active;
+            base.SetActive(active);
+        }
+
+        public HumanState(GameObject referenceObject, GameObject referenceFloor, Vector3 scale) : base(referenceObject, referenceFloor, scale)
+        {
+            if (referenceObject.GetComponent<PlayerPositionValidator>())
+            {
+                throw new UnityException("Missing expected component script on referenceObject");
+            }
         }
     }
 
-    class StateData
+
+
+    public abstract class CameraState : Location
     {
-        public GameObject positionObject;
+        public GameObject referenceObject;
+        public GameObject referenceFloor;
+
+        public Vector3 scale;
         public bool active;
 
-        public StateData (GameObject positionObject, bool active)
+        public override Vector3 position
         {
-            this.positionObject = positionObject;
+            get
+            {
+                Vector3 position = new Vector3(0, referenceFloor.transform.position.y, 0);
+                Vector3 referenceBounds = referenceObject.GetComponent<Renderer>().bounds.center;
+                position.x = referenceBounds.x;
+                position.z = referenceBounds.z;
+                return position;
+            }
+        }
+
+        public override Quaternion rotation 
+        {
+            get { return referenceObject.transform.rotation; }
+        }
+
+        public CameraState(GameObject referenceObject, GameObject referenceFloor, Vector3 scale)
+        {
+            this.referenceObject = referenceObject;
+            this.referenceFloor = referenceFloor;
+            this.scale = scale;
+        }
+
+        public virtual void SetActive(bool active)
+        {
             this.active = active;
         }
 
-        public void UpdateMetaphorPosition(GameObject cameraRig)
+        public virtual void UpdateCamera (GameObject cameraRig)
         {
-            positionObject.transform.position = cameraRig.transform.position;
-            positionObject.transform.rotation = cameraRig.transform.rotation;
+            SetCameraTransform(cameraRig, this.position, this.rotation, this.scale);
         }
 
-        public void SetActive(GameObject cameraRig, bool active)
+        protected void SetCameraTransform (GameObject cameraRig, Vector3 position, Quaternion rotation, Vector3 scale)
         {
-            if (!active)
-            {
-                UpdateMetaphorPosition(cameraRig);
-            }
-            positionObject.SetActive(!active);
+            cameraRig.transform.position = this.position;
+            cameraRig.transform.rotation = this.rotation;
+            cameraRig.transform.localScale = this.scale;
         }
+    }
+
+    public abstract class Location
+    {
+        public abstract Vector3 position { get; }
+        public abstract Quaternion rotation { get; }
     }
 }
