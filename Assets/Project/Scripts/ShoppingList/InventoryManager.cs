@@ -16,6 +16,8 @@ public class InventoryManager : MonoBehaviour {
 	public GameObject BGPanel;
 	public bool active;
 
+	public GameObject parentGO; 
+
 	public ItemChecker itemChecker; 
 
 	void Start () {
@@ -28,6 +30,8 @@ public class InventoryManager : MonoBehaviour {
 
 		int[] itemsToCheck = { 55, 55, 55 };
 		itemChecker = new ItemChecker (itemsToCheck);
+
+		this.transform.position = parentGO.transform.position;
 
 
 	}
@@ -43,6 +47,7 @@ public class InventoryManager : MonoBehaviour {
 		//		if (Input.GetKeyUp (KeyCode.Tab)) {
 		//			BGPanel.SetActive (false); 
 		//		}
+
 
 
 	}
