@@ -27,7 +27,7 @@ public partial class WandController : Owner
     public Vector3 velocity { get { return controller.velocity; } }
 
     public delegate void TouchpadPress(int index);
-    public delegate void TouchpadUpdate(int index, Vector2 position);
+    public delegate void TouchpadUpdate(int index, WandController controller);
 
     public event TouchpadPress OnTouchpadPress;
     public event TouchpadPress OnTouchpadRelease;
@@ -188,7 +188,7 @@ public partial class WandController : Owner
 
         if (controller.GetTouch(touchpadButton))
         {
-            OnTouchpadUpdate((int)trackedObject.index, controller.GetAxis(touchpadButton));
+            OnTouchpadUpdate((int)trackedObject.index, this);
         }
 
         // Viewpoint controls
@@ -223,21 +223,21 @@ public partial class WandController : Owner
         }
     }
 
-    void ChangeStateHandler()
+    public Vector2 GetTouchpadAxis()
+    {
+        return controller.GetAxis(touchpadButton);
+    }
+
+    private void ChangeStateHandler()
     {
         if (playerController.activeState is HumanState)
         {
             HumanStateChangeHandler();
         }
-        else if (playerController.activeState is GodState)
+        else if (playerController.activeState is CameraState)
         {
             GodStateChangeHandler();
         }
-    }
-
-    private void ThrowObject()
-    {
-        ownedItem.GetComponent<Throwable>().ThrowObject(playerController.activeState.forceScale);
     }
 
     public override void GiveUpObject(Property item)
@@ -247,6 +247,11 @@ public partial class WandController : Owner
             fixedJoint.connectedBody = null;
             base.GiveUpObject(item);
         }
+    }
+
+    private void ThrowObject()
+    {
+        ownedItem.GetComponent<Throwable>().ThrowObject(playerController.activeState.forceScale);
     }
 
     private void OnTriggerEnter(Collider other)

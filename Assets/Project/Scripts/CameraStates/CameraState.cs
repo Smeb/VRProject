@@ -2,11 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class CameraState : Location
+public class CameraState : Location
 {
     public GameObject referenceObject;
     public GameObject referenceFloor;
-    public GameObject cameraRig;
 
     public int scale;
     public int forceScale;
@@ -29,9 +28,8 @@ public abstract class CameraState : Location
         get { return referenceObject.transform.rotation; }
     }
 
-    public CameraState(GameObject cameraRig, GameObject referenceObject, GameObject referenceFloor, int scale, int forceScale)
+    public CameraState(GameObject referenceObject, GameObject referenceFloor, int scale, int forceScale)
     {
-        this.cameraRig = cameraRig;
         this.referenceObject = referenceObject;
         this.referenceFloor = referenceFloor;
         this.scale = scale;
@@ -41,17 +39,6 @@ public abstract class CameraState : Location
     public virtual void SetActive(bool active)
     {
         this.active = active;
-    }
-
-    public virtual void UpdateCamera()
-    {
-        SetCameraTransform(this.position, this.rotation, this.scale);
-    }
-
-    protected void SetCameraTransform(Vector3 position, Quaternion rotation, int scale)
-    {
-        cameraRig.transform.position = this.position;
-        cameraRig.transform.localScale = new Vector3(1, 1, 1) * this.scale;
     }
 }
 

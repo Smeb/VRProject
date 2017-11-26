@@ -5,6 +5,7 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     public GameObject cameraRig;
+    public float walkingSpeed;
 
     public GameObject humanReferencePosition, godReferencePosition, sceneFloor, supermarketFloor;
 
@@ -35,7 +36,7 @@ public class PlayerController : MonoBehaviour
                     OnChangeState();
                 }
 
-                m_activeState.UpdateCamera();
+                UpdateCamera(m_activeState);
             }
         }
     }
@@ -43,15 +44,10 @@ public class PlayerController : MonoBehaviour
     void Awake()
     {
         humanState = new HumanState(cameraRig, humanReferencePosition, supermarketFloor, 1, 1);
-        godState = new GodState(cameraRig, godReferencePosition, sceneFloor, 25, 8);
+        godState = new GodState(godReferencePosition, sceneFloor, 25, 8);
         activeState = humanState;
     }
-
-    private void Update()
-    {
-
-    }
-
+   
     public void RegisterWand(WandController controller)
     {
         controller.OnTouchpadPress += TouchpadPressHandler;
@@ -66,12 +62,31 @@ public class PlayerController : MonoBehaviour
         controller.OnTouchpadUpdate -= TouchpadUpdateHandler;
     }
 
-    private void TouchpadUpdateHandler(int index, Vector2 position)
+    private void TouchpadUpdateHandler(int index, WandController controller)
     {
         if (touchpadIndex == index)
         {
-            activeState.UpdateCamera();
+            Vector2 axis = controller.GetTouchpadAxis();
+            if (axis.y > 0.3f || axis.y < -0.3f)
+            {
+                float step = walkingSpeed * axis.y;
+                Vector3 forwards = new Vector3(
+                    controller.transform.forward.x, 0, controller.transform.forward.z).normalized;
+                Vector3 update = cameraRig.transform.position + step * Time.deltaTime * forwards * m_activeState.forceScale;
+                UpdateCamera(update);
+            }
         }
+    }
+
+    private void UpdateCamera(Vector3 update)
+    {
+        cameraRig.transform.position = update;
+    }
+
+    private void UpdateCamera(CameraState cameraState)
+    {
+        cameraRig.transform.position = cameraState.position;
+        cameraRig.transform.localScale = new Vector3(1, 1, 1) * cameraState.scale;
     }
 
     private void TouchpadPressHandler(int index)

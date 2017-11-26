@@ -50,6 +50,7 @@ GameObject:
   - component: {fileID: 3380982}
   - component: {fileID: 11489174}
   - component: {fileID: 114598277283281016}
+  - component: {fileID: 114785727022635438}
   m_Layer: 0
   m_Name: '[CameraRig]'
   m_TagString: Untagged
@@ -82,7 +83,6 @@ GameObject:
   m_Component:
   - component: {fileID: 408470}
   - component: {fileID: 2008320}
-  - component: {fileID: 114003654319287208}
   - component: {fileID: 11470538}
   - component: {fileID: 9213436}
   m_Layer: 0
@@ -570,17 +570,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &114003654319287208
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 155680}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5bf793150975d83438b3a05906c898b1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &114071020692132496
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -617,10 +606,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cameraRig: {fileID: 146900}
+  StepSize: 0.75
   humanReferencePosition: {fileID: 0}
   godReferencePosition: {fileID: 0}
   sceneFloor: {fileID: 0}
   supermarketFloor: {fileID: 0}
+--- !u!114 &114785727022635438
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 146900}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!135 &135266288395201002
 SphereCollider:
   m_ObjectHideFlags: 1

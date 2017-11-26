@@ -4,11 +4,7 @@ using UnityEngine;
 
 public class GodState : CameraState
 {
-    public override void UpdateCamera()
-    {
-        SetCameraTransform(this.position, cameraRig.transform.rotation, this.scale);
-    }
-
-    public GodState(GameObject cameraRig, GameObject referenceObject, GameObject referenceFloor, int scale, int forceScale)
-        : base(cameraRig, referenceObject, referenceFloor, scale, forceScale) { }
+    public GodState(GameObject referencePosition, GameObject referenceFloor, int scale, int forceScale)
+        : base(referencePosition, referenceFloor, scale, forceScale)
+    {}
 }

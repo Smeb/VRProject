@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class HumanState : CameraState
 {
+    private GameObject cameraRig;
+
     public override Vector3 position
     {
         get
@@ -31,8 +33,9 @@ public class HumanState : CameraState
     }
 
     public HumanState(GameObject cameraRig, GameObject referenceObject, GameObject referenceFloor, int scale, int forceScale)
-        : base(cameraRig, referenceObject, referenceFloor, scale, forceScale)
+        : base(referenceObject, referenceFloor, scale, forceScale)
     {
+        this.cameraRig = cameraRig;
         if (referenceObject.GetComponent<PlayerPositionValidator>())
         {
             throw new UnityException("Missing expected component script on referenceObject");
