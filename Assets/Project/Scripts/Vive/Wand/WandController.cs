@@ -26,8 +26,8 @@ public partial class WandController : Owner
     public Vector3 angularVelocity { get { return controller.angularVelocity; } }
     public Vector3 velocity { get { return controller.velocity; } }
 
-    public delegate void TouchpadPress(int index);
-    public delegate void TouchpadUpdate(int index, WandController controller);
+    public delegate void TouchpadPress(int index, WandController controller);
+    public delegate void TouchpadUpdate(int index);
 
     public event TouchpadPress OnTouchpadPress;
     public event TouchpadPress OnTouchpadRelease;
@@ -112,6 +112,8 @@ public partial class WandController : Owner
 
     void Awake()
     {
+        trackedObject = GetComponent<SteamVR_TrackedObject>();
+
         if (playerController == null)
         {
             playerController = GetComponentInParent<PlayerController>();
@@ -123,7 +125,6 @@ public partial class WandController : Owner
         }
 
         timer = new Timer();
-        trackedObject = GetComponent<SteamVR_TrackedObject>();
         fixedJoint = GetComponent<FixedJoint>();
     }
 
@@ -174,7 +175,7 @@ public partial class WandController : Owner
         {
             if (OnTouchpadRelease != null)
             {
-                OnTouchpadRelease((int)trackedObject.index);
+                OnTouchpadRelease((int)trackedObject.index, this);
             }
         }
 
@@ -182,13 +183,13 @@ public partial class WandController : Owner
         {
             if (OnTouchpadPress != null)
             {
-                OnTouchpadPress((int)trackedObject.index);
+                OnTouchpadPress((int)trackedObject.index, this);
             }
         }
 
         if (controller.GetTouch(touchpadButton))
         {
-            OnTouchpadUpdate((int)trackedObject.index, this);
+            OnTouchpadUpdate((int)trackedObject.index);
         }
 
         // Viewpoint controls

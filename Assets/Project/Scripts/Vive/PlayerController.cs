@@ -4,8 +4,12 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    public string locomotionMode = "step";
     public GameObject cameraRig;
     public float walkingSpeed;
+    private HMDController hmdController;
+    private WandController activeTouchpadController;
+    bool takeStep;
 
     public GameObject humanReferencePosition, godReferencePosition, sceneFloor, supermarketFloor;
 
@@ -46,8 +50,36 @@ public class PlayerController : MonoBehaviour
         humanState = new HumanState(cameraRig, humanReferencePosition, supermarketFloor, 1, 1);
         godState = new GodState(godReferencePosition, sceneFloor, 25, 8);
         activeState = humanState;
+        hmdController = gameObject.GetComponentInChildren<HMDController>();
     }
-   
+
+    private void OnEnable()
+    {
+        if (locomotionMode == "step")
+        {
+            hmdController.OnStepTaken += StepTaken;
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (locomotionMode == "step")
+        {
+            hmdController.OnStepTaken -= StepTaken;
+        }
+    }
+
+    private void StepTaken()
+    {
+        Debug.Log("Called " + Time.time);
+        if (activeTouchpadController)
+        {
+            Vector3 forwards = new Vector3(activeTouchpadController.transform.forward.x, 0, activeTouchpadController.transform.forward.z).normalized;
+            Vector3 update = cameraRig.transform.position + forwards * 0.75f;
+            UpdateCamera(update);
+        }
+    }
+
     public void RegisterWand(WandController controller)
     {
         controller.OnTouchpadPress += TouchpadPressHandler;
@@ -62,18 +94,21 @@ public class PlayerController : MonoBehaviour
         controller.OnTouchpadUpdate -= TouchpadUpdateHandler;
     }
 
-    private void TouchpadUpdateHandler(int index, WandController controller)
+    private void TouchpadUpdateHandler(int index)
     {
-        if (touchpadIndex == index)
+        if (locomotionMode == "touchpad")
         {
-            Vector2 axis = controller.GetTouchpadAxis();
-            if (axis.y > 0.3f || axis.y < -0.3f)
+            if (touchpadIndex == index)
             {
-                float step = walkingSpeed * axis.y;
-                Vector3 forwards = new Vector3(
-                    controller.transform.forward.x, 0, controller.transform.forward.z).normalized;
-                Vector3 update = cameraRig.transform.position + step * Time.deltaTime * forwards * m_activeState.forceScale;
-                UpdateCamera(update);
+                Vector2 axis = activeTouchpadController.GetTouchpadAxis();
+                if (axis.y > 0.3f || axis.y < -0.3f)
+                {
+                    float step = walkingSpeed * axis.y;
+                    Vector3 forwards = new Vector3(
+                        activeTouchpadController.transform.forward.x, 0, activeTouchpadController.transform.forward.z).normalized;
+                    Vector3 update = cameraRig.transform.position + step * Time.deltaTime * forwards * m_activeState.forceScale;
+                    UpdateCamera(update);
+                }
             }
         }
     }
@@ -89,18 +124,20 @@ public class PlayerController : MonoBehaviour
         cameraRig.transform.localScale = new Vector3(1, 1, 1) * cameraState.scale;
     }
 
-    private void TouchpadPressHandler(int index)
+    private void TouchpadPressHandler(int index, WandController controller)
     {
         if (touchpadIndex == -1)
         {
+            activeTouchpadController = controller;
             touchpadIndex = index;
         }
     }
 
-    private void TouchpadReleaseHandler(int index)
+    private void TouchpadReleaseHandler(int index, WandController controller)
     {
         if (index == touchpadIndex)
         {
+            activeTouchpadController = null;
             touchpadIndex = -1;
         }
     }
