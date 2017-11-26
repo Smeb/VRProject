@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -9,6 +9,7 @@ public abstract class CameraState : Location
     public GameObject cameraRig;
 
     public int scale;
+    public int forceScale;
     public bool active;
 
     public override Vector3 position
@@ -28,12 +29,13 @@ public abstract class CameraState : Location
         get { return referenceObject.transform.rotation; }
     }
 
-    public CameraState(GameObject cameraRig, GameObject referenceObject, GameObject referenceFloor, int scale)
+    public CameraState(GameObject cameraRig, GameObject referenceObject, GameObject referenceFloor, int scale, int forceScale)
     {
         this.cameraRig = cameraRig;
         this.referenceObject = referenceObject;
         this.referenceFloor = referenceFloor;
         this.scale = scale;
+        this.forceScale = forceScale;
     }
 
     public virtual void SetActive(bool active)

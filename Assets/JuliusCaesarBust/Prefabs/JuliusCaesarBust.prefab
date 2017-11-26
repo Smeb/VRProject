@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 2300000}
   - component: {fileID: 54807184089199844}
   - component: {fileID: 136592751878905770}
-  m_Layer: 9
+  m_Layer: 11
   m_Name: JuliusCaesarBust
   m_TagString: Untagged
   m_Icon: {fileID: 0}

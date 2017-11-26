@@ -5,12 +5,17 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     public GameObject cameraRig;
-    public WandController[] wandControllers;
 
     public GameObject humanReferencePosition, godReferencePosition, sceneFloor, supermarketFloor;
 
+    private CameraState humanState, godState;
     private CameraState m_activeState;
-    private CameraState activeState
+    private HMDController hmdController;
+
+    public delegate void ChangeState();
+    public event ChangeState OnChangeState;
+
+    public CameraState activeState
     {
         get { return m_activeState; }
         set
@@ -21,32 +26,47 @@ public class PlayerController : MonoBehaviour
                 {
                     m_activeState.SetActive(false);
                 }
+
                 m_activeState = value;
                 m_activeState.SetActive(true);
-                m_activeState.UpdateCamera();
-                foreach (WandController wandController in wandControllers)
+
+                if (OnChangeState != null)
                 {
-                    wandController.state = m_activeState;
+                    OnChangeState();
                 }
+
+                m_activeState.UpdateCamera();
             }
         }
     }
-    private CameraState humanState, godState;
 
-    void Start()
+    void Awake()
     {
-        wandControllers = cameraRig.GetComponentsInChildren<WandController>();
-        humanState = new HumanState(cameraRig, humanReferencePosition, supermarketFloor, 1);
-        godState = new GodState(cameraRig, godReferencePosition, sceneFloor, 25);
+        hmdController = gameObject.GetComponent<HMDController>();
+
+        humanState = new HumanState(cameraRig, humanReferencePosition, supermarketFloor, 1, 1);
+        godState = new GodState(cameraRig, godReferencePosition, sceneFloor, 25, 8);
         activeState = humanState;
     }
 
-    void Update()
+    private void Update()
     {
-        if (Input.GetKeyDown("space"))
-        {
-            ToggleViewpoint();
-        }
+
+    }
+
+    public void RegisterWand(WandController controller)
+    {
+        hmdController.RegisterWand(controller);
+    }
+
+    public void DeregisterWand(WandController controller)
+    {
+        hmdController.DeregisterWand(controller);
+    }
+
+    public GameObject GetHumanPosition()
+    {
+        return humanReferencePosition;
     }
 
     public void ToggleViewpoint()
@@ -59,6 +79,5 @@ public class PlayerController : MonoBehaviour
         {
             activeState = humanState;
         }
-        Debug.Log(activeState);
     }
 }

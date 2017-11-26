@@ -4,9 +4,11 @@ using UnityEngine;
 
 public class Throwable : Property {
     bool throwing = false;
+    int scale;
 
-    public void ThrowObject()
+    public void ThrowObject(int forceScale)
     {
+        this.scale = forceScale;
         throwing = true;
     }
 
@@ -33,7 +35,7 @@ public class Throwable : Property {
             }
             else
             {
-                rigidbody.velocity = wandOwner.velocity;
+                rigidbody.velocity = wandOwner.velocity * scale;
                 rigidbody.angularVelocity = wandOwner.angularVelocity * 0.25f;
             }
 

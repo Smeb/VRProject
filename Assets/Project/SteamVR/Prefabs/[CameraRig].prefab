@@ -49,6 +49,7 @@ GameObject:
   - component: {fileID: 2348914}
   - component: {fileID: 3380982}
   - component: {fileID: 11489174}
+  - component: {fileID: 114598277283281016}
   m_Layer: 0
   m_Name: '[CameraRig]'
   m_TagString: Untagged
@@ -81,6 +82,7 @@ GameObject:
   m_Component:
   - component: {fileID: 408470}
   - component: {fileID: 2008320}
+  - component: {fileID: 114003654319287208}
   - component: {fileID: 11470538}
   - component: {fileID: 9213436}
   m_Layer: 0
@@ -193,7 +195,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 146900}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.05, z: -0.651}
+  m_LocalPosition: {x: 28.6, y: 12.5, z: 24.9}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 458974}
@@ -568,6 +570,17 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &114003654319287208
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 155680}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5bf793150975d83438b3a05906c898b1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &114071020692132496
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -579,8 +592,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ac5afd6ff06c9349a89c31207277cd0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fixedJoint: {fileID: 0}
-  closestItem: {fileID: 0}
+  m_closestItem: {fileID: 0}
 --- !u!114 &114549251048823666
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -592,8 +604,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ac5afd6ff06c9349a89c31207277cd0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fixedJoint: {fileID: 0}
-  closestItem: {fileID: 0}
+  m_closestItem: {fileID: 0}
+--- !u!114 &114598277283281016
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 146900}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fc6bd5b6d2612fe4db90a7a4913b21e3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cameraRig: {fileID: 146900}
+  humanReferencePosition: {fileID: 0}
+  godReferencePosition: {fileID: 0}
+  sceneFloor: {fileID: 0}
+  supermarketFloor: {fileID: 0}
 --- !u!135 &135266288395201002
 SphereCollider:
   m_ObjectHideFlags: 1
@@ -628,7 +655,7 @@ FixedJoint:
   m_BreakForce: Infinity
   m_BreakTorque: Infinity
   m_EnableCollision: 0
-  m_EnablePreprocessing: 1
+  m_EnablePreprocessing: 0
   m_MassScale: 1
   m_ConnectedMassScale: 1
 --- !u!138 &138965194241157380
@@ -641,6 +668,6 @@ FixedJoint:
   m_BreakForce: Infinity
   m_BreakTorque: Infinity
   m_EnableCollision: 0
-  m_EnablePreprocessing: 1
+  m_EnablePreprocessing: 0
   m_MassScale: 1
   m_ConnectedMassScale: 1

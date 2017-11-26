@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -9,6 +9,6 @@ public class GodState : CameraState
         SetCameraTransform(this.position, cameraRig.transform.rotation, this.scale);
     }
 
-    public GodState(GameObject cameraRig, GameObject referenceObject, GameObject referenceFloor, int scale)
-        : base(cameraRig, referenceObject, referenceFloor, scale) { }
+    public GodState(GameObject cameraRig, GameObject referenceObject, GameObject referenceFloor, int scale, int forceScale)
+        : base(cameraRig, referenceObject, referenceFloor, scale, forceScale) { }
 }

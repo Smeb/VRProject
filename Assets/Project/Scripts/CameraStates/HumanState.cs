@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -21,8 +21,8 @@ public class HumanState : CameraState
         base.SetActive(active);
     }
 
-    public HumanState(GameObject cameraRig, GameObject referenceObject, GameObject referenceFloor, int scale)
-        : base(cameraRig, referenceObject, referenceFloor, scale)
+    public HumanState(GameObject cameraRig, GameObject referenceObject, GameObject referenceFloor, int scale, int forceScale)
+        : base(cameraRig, referenceObject, referenceFloor, scale, forceScale)
     {
         if (referenceObject.GetComponent<PlayerPositionValidator>())
         {
