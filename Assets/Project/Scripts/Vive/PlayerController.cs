@@ -10,7 +10,7 @@ public class PlayerController : MonoBehaviour
 
     private CameraState humanState, godState;
     private CameraState m_activeState;
-    private HMDController hmdController;
+    private int touchpadIndex = -1;
 
     public delegate void ChangeState();
     public event ChangeState OnChangeState;
@@ -42,8 +42,6 @@ public class PlayerController : MonoBehaviour
 
     void Awake()
     {
-        hmdController = gameObject.GetComponent<HMDController>();
-
         humanState = new HumanState(cameraRig, humanReferencePosition, supermarketFloor, 1, 1);
         godState = new GodState(cameraRig, godReferencePosition, sceneFloor, 25, 8);
         activeState = humanState;
@@ -56,12 +54,40 @@ public class PlayerController : MonoBehaviour
 
     public void RegisterWand(WandController controller)
     {
-        hmdController.RegisterWand(controller);
+        controller.OnTouchpadPress += TouchpadPressHandler;
+        controller.OnTouchpadRelease += TouchpadReleaseHandler;
+        controller.OnTouchpadUpdate += TouchpadUpdateHandler;
     }
 
     public void DeregisterWand(WandController controller)
     {
-        hmdController.DeregisterWand(controller);
+        controller.OnTouchpadPress -= TouchpadPressHandler;
+        controller.OnTouchpadRelease -= TouchpadReleaseHandler;
+        controller.OnTouchpadUpdate -= TouchpadUpdateHandler;
+    }
+
+    private void TouchpadUpdateHandler(int index, Vector2 position)
+    {
+        if (touchpadIndex == index)
+        {
+            activeState.UpdateCamera();
+        }
+    }
+
+    private void TouchpadPressHandler(int index)
+    {
+        if (touchpadIndex == -1)
+        {
+            touchpadIndex = index;
+        }
+    }
+
+    private void TouchpadReleaseHandler(int index)
+    {
+        if (index == touchpadIndex)
+        {
+            touchpadIndex = -1;
+        }
     }
 
     public GameObject GetHumanPosition()

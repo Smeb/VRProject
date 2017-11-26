@@ -26,15 +26,12 @@ public partial class WandController : Owner
     public Vector3 angularVelocity { get { return controller.angularVelocity; } }
     public Vector3 velocity { get { return controller.velocity; } }
 
-    // Touchpad event delegation
     public delegate void TouchpadPress(int index);
-    public delegate void TouchpadUpdate(float x, float y);
+    public delegate void TouchpadUpdate(int index, Vector2 position);
 
     public event TouchpadPress OnTouchpadPress;
     public event TouchpadPress OnTouchpadRelease;
     public event TouchpadUpdate OnTouchpadUpdate;
-
-    private bool touchpadPressed;
 
     // Object highlighting and selection
     private static Dictionary<Material, Material> highlights;
@@ -172,15 +169,8 @@ public partial class WandController : Owner
             return;
         }
 
-        if (controller.GetPressDown(touchpadButton))
-        {
-            if (OnTouchpadPress != null)
-            {
-                OnTouchpadPress((int)trackedObject.index);
-            }
-        }
-
-        if (controller.GetPressUp(touchpadButton))
+        // Touchpad controls
+        if (controller.GetTouchUp(touchpadButton))
         {
             if (OnTouchpadRelease != null)
             {
@@ -188,11 +178,27 @@ public partial class WandController : Owner
             }
         }
 
+        if (controller.GetTouchDown(touchpadButton))
+        {
+            if (OnTouchpadPress != null)
+            {
+                OnTouchpadPress((int)trackedObject.index);
+            }
+        }
+
+        if (controller.GetTouch(touchpadButton))
+        {
+            OnTouchpadUpdate((int)trackedObject.index, controller.GetAxis(touchpadButton));
+        }
+
+        // Viewpoint controls
         if (controller.GetPressDown(toggleViewpoint))
         {
             timer.StartTimer(toggleViewpoint);
         }
 
+
+        // Trigger controls
         if (ownedItem == null)
         {
             SetClosestItem();
@@ -206,6 +212,7 @@ public partial class WandController : Owner
             }
         }
 
+        // Conditional Updates
         if (playerController.activeState is HumanState)
         {
             HumanUpdate();

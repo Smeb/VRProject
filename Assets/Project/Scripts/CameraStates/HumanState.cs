@@ -9,7 +9,7 @@ public class HumanState : CameraState
         get
         {
             Vector3 position = base.position;
-            Vector3 cameraOffset = cameraRig.GetComponentInChildren<Camera>().transform.localPosition;
+            Vector3 cameraOffset = cameraRig.GetComponentInChildren<SteamVR_Camera>().head.localPosition;
             cameraOffset.y = 0;
             return position - cameraOffset;
         }
@@ -17,7 +17,16 @@ public class HumanState : CameraState
 
     public override void SetActive(bool active)
     {
-        referenceObject.GetComponent<Renderer>().enabled = !active;
+        Renderer renderer = referenceObject.GetComponent<Renderer>();
+        renderer.enabled = !active;
+        if (!active)
+        {
+            // Update the position of the reference object based on the user's current position
+            Vector3 positionOriginOffset = referenceObject.transform.position - renderer.bounds.center;
+            Vector3 newObjectPosition = cameraRig.GetComponentInChildren<SteamVR_Camera>().head.position + positionOriginOffset;
+            newObjectPosition.y = referenceFloor.transform.position.y + renderer.bounds.size.y / 2;
+            referenceObject.transform.position = newObjectPosition;
+        }
         base.SetActive(active);
     }
 
