@@ -107,7 +107,7 @@ public class PlayerController : MonoBehaviour
             Vector3 moveDirection = activeTouchpadController.transform.rotation * Vector3.forward;
             moveDirection = new Vector3(moveDirection.x, 0, moveDirection.z).normalized;
             Vector3 move = moveDirection * velocity * Time.deltaTime;
-            transform.position += transform.rotation * move;
+            transform.position += move;
         }
         lastPosition = camera.head.localPosition;
     }
