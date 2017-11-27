@@ -86,17 +86,22 @@ public partial class WandController : Owner
         fixedJoint = GetComponent<FixedJoint>();
         pointer = GetComponent<SteamVR_LaserPointer>();
 
+        FindEventSystem();
         SceneManager.sceneLoaded += OnSceneLoad;
+    }
+
+    void FindEventSystem()
+    {
+        if (pointer)
+        {
+            eventSystem = GameObject.Find("EventSystem").GetComponent<EventSystem>();
+        }
     }
 
     void OnSceneLoad(Scene scene, LoadSceneMode mode)
     {
         if (scene.name == "Persistent") return;
-
-        if (pointer)
-        {
-            eventSystem = GameObject.Find("EventSystem").GetComponent<EventSystem>();
-        }
+        FindEventSystem();
     }
 
     private void OnEnable()

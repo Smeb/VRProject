@@ -12,7 +12,8 @@ public class PlayerController : MonoBehaviour
     string locomotion = "walk-in-place";
     Vector3 lastPosition;
     float velocity;
-    float headPosition = 1.65f;
+    [SerializeField] float headPosition = 1.65f;
+    float headOffset = 0.03f;
 
     public GameObject godReferencePosition, godReferenceFloor, humanReferenceFloor, humanReferencePosition;
 
@@ -78,17 +79,17 @@ public class PlayerController : MonoBehaviour
     private void Update()
     {
         SteamVR_Camera camera = cameraRig.GetComponentInChildren<SteamVR_Camera>();
-        if (locomotion == "walk-in-place" && activeTouchpadController)
+        if (locomotion == "walk-in-place" &&
+            activeTouchpadController &&
+            camera.head.localPosition.y > headPosition - headOffset)
         {
-            var yChange = camera.head.localPosition.y - lastPosition.y;
-            var desiredVelocity = Time.deltaTime > 0 ? (Mathf.Abs(yChange)) * 5 / Time.deltaTime : 0;
-                velocity = Mathf.Lerp(velocity, desiredVelocity, Time.deltaTime * 5);
-
-                var lookDirection = camera.transform.rotation * Vector3.forward;
-                var moveDirection = new Vector3(lookDirection.x, 0, lookDirection.z).normalized;
-                var move = moveDirection * velocity * Time.deltaTime;
-
-                transform.position += transform.rotation * move;
+            float yChange = camera.head.localPosition.y - lastPosition.y;
+            float desiredVelocity = Time.deltaTime > 0 ? (Mathf.Abs(yChange)) * 5 / Time.deltaTime : 0;
+            velocity = Mathf.Lerp(velocity, desiredVelocity, Time.deltaTime * 5);
+            Vector3 moveDirection = activeTouchpadController.transform.rotation * Vector3.forward;
+            moveDirection = new Vector3(moveDirection.x, 0, moveDirection.z).normalized;
+            Vector3 move = moveDirection * velocity * Time.deltaTime;
+            transform.position += transform.rotation * move;
         }
         lastPosition = camera.head.localPosition;
     }
