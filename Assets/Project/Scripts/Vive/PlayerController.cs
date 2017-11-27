@@ -14,7 +14,7 @@ public class PlayerController : MonoBehaviour
     float velocity;
     float headPosition = 1.65f;
 
-    private GameObject godReferencePosition, godReferenceFloor, humanReferenceFloor, humanReferencePosition;
+    public GameObject godReferencePosition, godReferenceFloor, humanReferenceFloor, humanReferencePosition;
 
     private CameraState humanState, godState;
     private CameraState m_activeState;
@@ -48,9 +48,9 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    void OnSceneLoad(Scene scene, LoadSceneMode mode)
+    void OnSceneLoad()
     {
-        if (scene.name == "Persistent") return;
+        m_activeState = null;
 
         humanReferencePosition = GameObject.Find("HumanPosition");
         humanReferenceFloor = GameObject.Find("HumanFloor");
@@ -70,7 +70,7 @@ public class PlayerController : MonoBehaviour
 
     void Awake()
     {
-        SceneManager.sceneLoaded += OnSceneLoad;
+        GameObject.Find("SceneManager").GetComponent<PersistentSceneManager>().SceneLoadComplete += OnSceneLoad;
     }
 
     private void Update()

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class UIController : MonoBehaviour
+public class ConfigController : MonoBehaviour
 {
     private PlayerController playerController;
     int instructionIndex;
@@ -12,8 +12,8 @@ public class UIController : MonoBehaviour
     private Button optionalButton, nextButton, prevButton, continueButton;
     private Text title, body, info, optionalButtonText;
     
-    enum State { HEIGHT_CALIBRATION, MOVEMENT_TUTORIAL, STATE_SWAP_TUTORIAL, INVENTORY_TUTORIAL, COMBINED_TUTORIAL, BRIEFING }
-    State activeState;
+    enum State { HEIGHT_CALIBRATION, BEFORE_CONTINUING, END_SCENE }
+    [SerializeField] State activeState;
 
 	// Use this for initialization
 	void Start () {
@@ -28,7 +28,7 @@ public class UIController : MonoBehaviour
         prevButton = GameObject.Find("Previous").GetComponent<Button>();
 
         optionalButton = GameObject.Find("OptionalButton").GetComponent<Button>();
-        optionalButtonText = optionalButton.GetComponent<Text>();
+        optionalButtonText = optionalButton.GetComponentInChildren<Text>();
 
         continueButton.onClick.AddListener(() => Continue());
         nextButton.onClick.AddListener(() => Next());
@@ -41,6 +41,7 @@ public class UIController : MonoBehaviour
     {
         float height = playerController.SetHeight();
         info.text = "Calibrated height: " + height.ToString("F2") + "m";
+        optionalButtonText.text = "Re-calibrate";
         continueButton.interactable = true;
     }
 
@@ -83,19 +84,21 @@ public class UIController : MonoBehaviour
         UpdateText();
     }
 
-    private void MovementTutorialSetup()
+    private void EndScene()
     {
-        title.text = "Movement Tutorial";
-        instructions = new string[2];
-        instructions[0] = "To move, press the touchpad button on one of your controllers, then move up and down on the spot";
-        instructions[1] = "To complete the tutorial, move to the panel on your right";
+        GameObject.Find("SceneManager").GetComponent<PersistentSceneManager>().LoadLevel("Tutorial");
+    }
 
+    private void BeforeContinueSetup()
+    {
+        title.text = "Before you continue";
+        instructions = new string[1];
+        instructions[0] = "We're now going to load a test environment, to teach you to move and interact";
         info.text = "";
 
         optionalButton.gameObject.SetActive(false);
-        continueButton.gameObject.SetActive(false);
-        nextButton.gameObject.SetActive(true);
-        prevButton.gameObject.SetActive(true);
+        continueButton.gameObject.SetActive(true);
+        continueButton.enabled = true;
     }
 
     private void HeightCalibrationSetup()
@@ -122,11 +125,8 @@ public class UIController : MonoBehaviour
         switch (activeState)
         {
             case State.HEIGHT_CALIBRATION: HeightCalibrationSetup(); break;
-            case State.MOVEMENT_TUTORIAL: MovementTutorialSetup();  break;
-            case State.STATE_SWAP_TUTORIAL: break;
-            case State.INVENTORY_TUTORIAL: break;
-            case State.COMBINED_TUTORIAL: break;
-            case State.BRIEFING: break;
+            case State.BEFORE_CONTINUING: BeforeContinueSetup();  break;
+            case State.END_SCENE: EndScene(); break;
         }
 
         if (instructions.Length > 1)

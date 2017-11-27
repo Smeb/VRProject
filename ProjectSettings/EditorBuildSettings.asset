@@ -9,5 +9,8 @@ EditorBuildSettings:
     path: Assets/Project/Scenes/Persistent.unity
     guid: 22562e7660f4d4e4ba2d0887c825109e
   - enabled: 1
+    path: Assets/Project/Scenes/UITestScene.unity
+    guid: c82538773e4ad6f459546f2af4eeb33c
+  - enabled: 1
     path: Assets/Project/Scenes/TestSpace.unity
     guid: ba7b65d9fa080dc4692bb3e93317bb68
