@@ -1,7 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
+[RequireComponent(typeof(FixedJoint))]
 public partial class WandController : Owner
 {
     private static PlayerController playerController;
@@ -13,21 +16,24 @@ public partial class WandController : Owner
 
     private SteamVR_Controller.Device controller {  get { return SteamVR_Controller.Input((int)trackedObject.index); } }
     private SteamVR_TrackedObject trackedObject;
-    
+
     // Button press timing
     private Timer timer;
-    
+
     // Item ownership mechanisms
+    private Button button;
     private ContainerController container;
     private FixedJoint fixedJoint;
+    private EventSystem eventSystem;
+    private SteamVR_LaserPointer pointer;
 
     // Propagating transforms of tracked controller
     public Transform origin { get { return trackedObject.origin; } }
     public Vector3 angularVelocity { get { return controller.angularVelocity; } }
     public Vector3 velocity { get { return controller.velocity; } }
 
-    public delegate void TouchpadPress(int index);
-    public delegate void TouchpadUpdate(int index, WandController controller);
+    public delegate void TouchpadPress(WandController controller);
+    public delegate void TouchpadUpdate(WandController controller);
 
     public event TouchpadPress OnTouchpadPress;
     public event TouchpadPress OnTouchpadRelease;
@@ -61,6 +67,165 @@ public partial class WandController : Owner
             return m_closestItem;
         }
     }
+
+    void Awake()
+    {
+        if (playerController == null)
+        {
+            playerController = GetComponentInParent<PlayerController>();
+        }
+
+        if (highlights == null)
+        {
+            highlights = new Dictionary<Material, Material>();
+        }
+
+        timer = new Timer();
+        trackedObject = GetComponent<SteamVR_TrackedObject>();
+        fixedJoint = GetComponent<FixedJoint>();
+        pointer = GetComponent<SteamVR_LaserPointer>();
+        if (pointer)
+        {
+            eventSystem = GameObject.Find("EventSystem").GetComponent<EventSystem>();
+        }
+    }
+
+    private void OnEnable()
+    {
+        if (pointer != null)
+        {
+            pointer.PointerIn += OnPointerEnter;
+            pointer.PointerOut += OnPointerExit;
+        }
+        playerController.OnChangeState += ChangeStateHandler;
+        playerController.RegisterWand(this);
+    }
+
+    private void OnDisable()
+    {
+        if (pointer != null)
+        {
+            pointer.PointerIn += OnPointerEnter;
+            pointer.PointerOut += OnPointerExit;
+        }
+        playerController.OnChangeState -= ChangeStateHandler;
+        playerController.DeregisterWand(this);
+    }
+
+    public void OnPointerEnter(object sender, PointerEventArgs e)
+    {
+        Button buttonTarget = e.target.GetComponent<Button>();
+        if (buttonTarget != null && buttonTarget.interactable)
+        {
+            buttonTarget.Select();
+            button = buttonTarget;
+        }
+    }
+
+    public void OnPointerExit(object sender, PointerEventArgs e)
+    {
+        if (button != null)
+        {
+            eventSystem.SetSelectedGameObject(null);
+            button = null;
+        }
+    }
+
+    private void ChangeStateHandler()
+    {
+        if (playerController.activeState is HumanState)
+        {
+            HumanStateChangeHandler();
+        }
+        else if (playerController.activeState is CameraState)
+        {
+            GodStateChangeHandler();
+        }
+    }
+
+	void Update () {
+		if (controller == null)
+        {
+            Debug.Log("Controller not initialized.");
+            return;
+        }
+
+        // Touchpad controls
+        if (controller.GetTouchUp(touchpadButton))
+        {
+            if (OnTouchpadRelease != null)
+            {
+                OnTouchpadRelease(this);
+            }
+        }
+
+        if (controller.GetTouchDown(touchpadButton))
+        {
+            if (OnTouchpadPress != null)
+            {
+                OnTouchpadPress(this);
+            }
+        }
+
+        if (controller.GetTouch(touchpadButton))
+        {
+            OnTouchpadUpdate(this);
+        }
+
+        // Viewpoint controls
+        if (controller.GetPressDown(toggleViewpoint))
+        {
+            timer.StartTimer(toggleViewpoint);
+        }
+
+        // Trigger controls
+        if (ownedItem == null)
+        {
+            SetClosestItem();
+        }
+
+        if (controller.GetPressDown(triggerButton))
+        {
+            if (button != null)
+            {
+                button.onClick.Invoke();
+            }
+            else if (closestItem)
+            {
+                GrabItem();
+            }
+        }
+
+        // Conditional Updates
+        if (playerController.activeState is HumanState)
+        {
+            HumanUpdate();
+        }
+        else if (playerController.activeState is GodState)
+        {
+            GodUpdate();
+        }
+    }
+
+    public Vector2 GetTouchpadAxis()
+    {
+        return controller.GetAxis(touchpadButton);
+    }
+
+    public override void GiveUpObject(Property item)
+    {
+        if (ownedItem == item)
+        {
+            fixedJoint.connectedBody = null;
+            base.GiveUpObject(item);
+        }
+    }
+
+    private void ThrowObject()
+    {
+        ownedItem.GetComponent<Throwable>().ThrowObject(playerController.activeState.forceScale);
+    }
+
 
     void SwapTextures(GameObject gameObject)
     {
@@ -110,34 +275,6 @@ public partial class WandController : Owner
         closestItem = null;
     }
 
-    void Awake()
-    {
-        if (playerController == null)
-        {
-            playerController = GetComponentInParent<PlayerController>();
-        }
-
-        if (highlights == null)
-        {
-            highlights = new Dictionary<Material, Material>();
-        }
-
-        timer = new Timer();
-        trackedObject = GetComponent<SteamVR_TrackedObject>();
-        fixedJoint = GetComponent<FixedJoint>();
-    }
-
-    private void OnEnable()
-    {
-        playerController.OnChangeState += ChangeStateHandler;
-        playerController.RegisterWand(this);
-    }
-
-    private void OnDisable()
-    {
-        playerController.OnChangeState -= ChangeStateHandler;
-        playerController.DeregisterWand(this);
-    }
 
     void SetClosestItem()
     {
@@ -160,98 +297,6 @@ public partial class WandController : Owner
         {
             closestItem = null;
         }
-    }
-    
-	void Update () {
-		if (controller == null)
-        {
-            Debug.Log("Controller not initialized.");
-            return;
-        }
-
-        // Touchpad controls
-        if (controller.GetTouchUp(touchpadButton))
-        {
-            if (OnTouchpadRelease != null)
-            {
-                OnTouchpadRelease((int)trackedObject.index);
-            }
-        }
-
-        if (controller.GetTouchDown(touchpadButton))
-        {
-            if (OnTouchpadPress != null)
-            {
-                OnTouchpadPress((int)trackedObject.index);
-            }
-        }
-
-        if (controller.GetTouch(touchpadButton))
-        {
-            OnTouchpadUpdate((int)trackedObject.index, this);
-        }
-
-        // Viewpoint controls
-        if (controller.GetPressDown(toggleViewpoint))
-        {
-            timer.StartTimer(toggleViewpoint);
-        }
-
-
-        // Trigger controls
-        if (ownedItem == null)
-        {
-            SetClosestItem();
-        }
-
-        if (controller.GetPressDown(triggerButton))
-        {
-            if (closestItem)
-            {
-                GrabItem();
-            }
-        }
-
-        // Conditional Updates
-        if (playerController.activeState is HumanState)
-        {
-            HumanUpdate();
-        }
-        else if (playerController.activeState is GodState)
-        {
-            GodUpdate();
-        }
-    }
-
-    public Vector2 GetTouchpadAxis()
-    {
-        return controller.GetAxis(touchpadButton);
-    }
-
-    private void ChangeStateHandler()
-    {
-        if (playerController.activeState is HumanState)
-        {
-            HumanStateChangeHandler();
-        }
-        else if (playerController.activeState is CameraState)
-        {
-            GodStateChangeHandler();
-        }
-    }
-
-    public override void GiveUpObject(Property item)
-    {
-        if (ownedItem == item)
-        {
-            fixedJoint.connectedBody = null;
-            base.GiveUpObject(item);
-        }
-    }
-
-    private void ThrowObject()
-    {
-        ownedItem.GetComponent<Throwable>().ThrowObject(playerController.activeState.forceScale);
     }
 
     private void OnTriggerEnter(Collider other)

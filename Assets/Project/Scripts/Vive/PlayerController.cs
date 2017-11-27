@@ -5,7 +5,13 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     public GameObject cameraRig;
+
+    WandController activeTouchpadController;
     public float walkingSpeed;
+    string locomotion = "walk-in-place";
+    Vector3 lastPosition;
+    float velocity;
+    float headPosition = 1.65f;
 
     public GameObject humanReferencePosition, godReferencePosition, sceneFloor, supermarketFloor;
 
@@ -47,7 +53,25 @@ public class PlayerController : MonoBehaviour
         godState = new GodState(godReferencePosition, sceneFloor, 25, 8);
         activeState = humanState;
     }
-   
+
+    private void Update()
+    {
+        SteamVR_Camera camera = cameraRig.GetComponentInChildren<SteamVR_Camera>();
+        if (locomotion == "walk-in-place" && activeTouchpadController)
+        {
+            var yChange = camera.head.localPosition.y - lastPosition.y;
+            var desiredVelocity = Time.deltaTime > 0 ? (Mathf.Abs(yChange)) * 5 / Time.deltaTime : 0;
+                velocity = Mathf.Lerp(velocity, desiredVelocity, Time.deltaTime * 5);
+
+                var lookDirection = camera.transform.rotation * Vector3.forward;
+                var moveDirection = new Vector3(lookDirection.x, 0, lookDirection.z).normalized;
+                var move = moveDirection * velocity * Time.deltaTime;
+
+                transform.position += transform.rotation * move;
+        }
+        lastPosition = camera.head.localPosition;
+    }
+
     public void RegisterWand(WandController controller)
     {
         controller.OnTouchpadPress += TouchpadPressHandler;
@@ -62,9 +86,9 @@ public class PlayerController : MonoBehaviour
         controller.OnTouchpadUpdate -= TouchpadUpdateHandler;
     }
 
-    private void TouchpadUpdateHandler(int index, WandController controller)
+    private void TouchpadUpdateHandler(WandController controller)
     {
-        if (touchpadIndex == index)
+        if (activeTouchpadController == controller && locomotion == "touchpad")
         {
             Vector2 axis = controller.GetTouchpadAxis();
             if (axis.y > 0.3f || axis.y < -0.3f)
@@ -89,19 +113,19 @@ public class PlayerController : MonoBehaviour
         cameraRig.transform.localScale = new Vector3(1, 1, 1) * cameraState.scale;
     }
 
-    private void TouchpadPressHandler(int index)
+    private void TouchpadPressHandler(WandController controller)
     {
-        if (touchpadIndex == -1)
+        if (activeTouchpadController == null)
         {
-            touchpadIndex = index;
+            activeTouchpadController = controller;
         }
     }
 
-    private void TouchpadReleaseHandler(int index)
+    private void TouchpadReleaseHandler(WandController controller)
     {
-        if (index == touchpadIndex)
+        if (activeTouchpadController == controller)
         {
-            touchpadIndex = -1;
+            activeTouchpadController = null;
         }
     }
 
@@ -120,5 +144,12 @@ public class PlayerController : MonoBehaviour
         {
             activeState = humanState;
         }
+    }
+
+    public float SetHeight()
+    {
+        SteamVR_Camera camera = cameraRig.GetComponentInChildren<SteamVR_Camera>();
+        headPosition = camera.head.localPosition.y;
+        return headPosition;
     }
 }

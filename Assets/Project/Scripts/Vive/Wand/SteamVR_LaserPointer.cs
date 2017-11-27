@@ -1,4 +1,6 @@
-﻿//======= Copyright (c) Valve Corporation, All rights reserved. ===============
+//======= Copyright (c) Valve Corporation, All rights reserved. ===============
+
+// Slightly changed to only render the laser if the Raycast is coincident with an interface panel
 using UnityEngine;
 using System.Collections;
 
@@ -91,7 +93,8 @@ public class SteamVR_LaserPointer : MonoBehaviour
 
         Ray raycast = new Ray(transform.position, transform.forward);
         RaycastHit hit;
-        bool bHit = Physics.Raycast(raycast, out hit);
+        bool bHit = Physics.Raycast(raycast, out hit, 100000f, LayerMask.GetMask("Interface"));
+        // pointer.GetComponent<Renderer>().enabled = bHit;
 
         if(previousContact && previousContact != hit.transform)
         {
