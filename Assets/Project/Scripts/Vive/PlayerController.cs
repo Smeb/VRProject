@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
@@ -13,7 +14,7 @@ public class PlayerController : MonoBehaviour
     float velocity;
     float headPosition = 1.65f;
 
-    public GameObject humanReferencePosition, godReferencePosition, sceneFloor, supermarketFloor;
+    private GameObject godReferencePosition, godReferenceFloor, humanReferenceFloor, humanReferencePosition;
 
     private CameraState humanState, godState;
     private CameraState m_activeState;
@@ -47,11 +48,27 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    void OnSceneLoad(Scene scene, LoadSceneMode mode)
+    {
+
+        humanReferencePosition = GameObject.Find("HumanPosition");
+        humanReferenceFloor = GameObject.Find("HumanFloor");
+        godReferencePosition = GameObject.Find("GodPosition");
+        godReferenceFloor = GameObject.Find("GodFloor");
+
+        if (humanReferenceFloor == null) Debug.LogError("Human floor reference missing");
+        if (humanReferencePosition == null) Debug.LogError("Human position reference missing");
+        if (godReferenceFloor == null) Debug.LogError("God floor reference missing");
+        if (godReferencePosition == null) Debug.LogError("God position reference missing");
+
+        humanState = new HumanState(cameraRig, humanReferencePosition, humanReferenceFloor, 1, 1);
+        godState = new GodState(godReferencePosition, godReferenceFloor, 25, 8);
+        activeState = humanState;
+    }
+
     void Awake()
     {
-        humanState = new HumanState(cameraRig, humanReferencePosition, supermarketFloor, 1, 1);
-        godState = new GodState(godReferencePosition, sceneFloor, 25, 8);
-        activeState = humanState;
+        SceneManager.sceneLoaded += OnSceneLoad;
     }
 
     private void Update()
