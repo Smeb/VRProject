@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 [RequireComponent(typeof(FixedJoint))]
@@ -84,6 +85,14 @@ public partial class WandController : Owner
         trackedObject = GetComponent<SteamVR_TrackedObject>();
         fixedJoint = GetComponent<FixedJoint>();
         pointer = GetComponent<SteamVR_LaserPointer>();
+
+        SceneManager.sceneLoaded += OnSceneLoad;
+    }
+
+    void OnSceneLoad(Scene scene, LoadSceneMode mode)
+    {
+        if (scene.name == "Persistent") return;
+
         if (pointer)
         {
             eventSystem = GameObject.Find("EventSystem").GetComponent<EventSystem>();

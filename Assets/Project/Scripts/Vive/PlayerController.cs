@@ -50,6 +50,7 @@ public class PlayerController : MonoBehaviour
 
     void OnSceneLoad(Scene scene, LoadSceneMode mode)
     {
+        if (scene.name == "Persistent") return;
 
         humanReferencePosition = GameObject.Find("HumanPosition");
         humanReferenceFloor = GameObject.Find("HumanFloor");
@@ -64,6 +65,7 @@ public class PlayerController : MonoBehaviour
         humanState = new HumanState(cameraRig, humanReferencePosition, humanReferenceFloor, 1, 1);
         godState = new GodState(godReferencePosition, godReferenceFloor, 25, 8);
         activeState = humanState;
+        UpdateCamera(activeState);
     }
 
     void Awake()
