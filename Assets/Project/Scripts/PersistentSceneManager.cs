@@ -6,9 +6,6 @@ using UnityEngine;
 public class PersistentSceneManager : MonoBehaviour {
     string previousScene;
 
-    public delegate void SceneLoadCompleted();
-    public event SceneLoadCompleted SceneLoadComplete;
-
 	void Start () {
         LoadLevel("Config");
 	}
@@ -37,10 +34,6 @@ public class PersistentSceneManager : MonoBehaviour {
         }
 
         SceneManager.SetActiveScene(SceneManager.GetSceneByName(sceneName));
-        if (SceneLoadComplete != null)
-        {
-            SceneLoadComplete();
-        }
         previousScene = sceneName;
     }
 }

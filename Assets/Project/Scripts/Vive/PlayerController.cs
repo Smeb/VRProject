@@ -48,8 +48,10 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    void OnSceneLoad()
+    void OnSceneLoad(Scene scene, LoadSceneMode mode)
     {
+        if (scene.name == "Persistent") return;
+
         m_activeState = null;
 
         humanReferencePosition = GameObject.Find("HumanPosition");
@@ -70,7 +72,7 @@ public class PlayerController : MonoBehaviour
 
     void Awake()
     {
-        GameObject.Find("SceneManager").GetComponent<PersistentSceneManager>().SceneLoadComplete += OnSceneLoad;
+        SceneManager.sceneLoaded += OnSceneLoad;
     }
 
     private void Update()
