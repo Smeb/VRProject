@@ -12,10 +12,13 @@ public class PlayerController : MonoBehaviour
     string locomotion = "walk-in-place";
     Vector3 lastPosition;
     float velocity;
+
     [SerializeField] float headPosition = 1.65f;
+    float wallHeight = 8f;
     float headOffset = 0.03f;
 
     public GameObject godReferencePosition, godReferenceFloor, humanReferenceFloor, humanReferencePosition;
+    int godScale = 25, godForceScale = 8;
 
     private CameraState humanState, godState;
     private CameraState m_activeState;
@@ -60,15 +63,30 @@ public class PlayerController : MonoBehaviour
         godReferencePosition = GameObject.Find("GodPosition");
         godReferenceFloor = GameObject.Find("GodFloor");
 
+        SetGodFloorAndPosition();
+
         if (humanReferenceFloor == null) Debug.LogError("Human floor reference missing");
         if (humanReferencePosition == null) Debug.LogError("Human position reference missing");
         if (godReferenceFloor == null) Debug.LogError("God floor reference missing");
         if (godReferencePosition == null) Debug.LogError("God position reference missing");
 
         humanState = new HumanState(cameraRig, humanReferencePosition, humanReferenceFloor, 1, 1);
-        godState = new GodState(godReferencePosition, godReferenceFloor, 25, 8);
+        godState = new GodState(godReferencePosition, godReferenceFloor, godScale, godForceScale);
         activeState = humanState;
         UpdateCamera(activeState);
+    }
+
+    void SetGodFloorAndPosition()
+    {
+        // Manually adjust the GodPositionReference and GodFloor dependent on the user's height
+        Renderer godPositionRenderer = godReferencePosition.GetComponent<Renderer>();
+        float godHeight = headPosition * 1.2f;
+        
+        godReferencePosition.transform.localScale = new Vector3(godReferencePosition.transform.localScale.x, godReferencePosition.transform.localScale.y, godReferencePosition.transform.localScale.z * godHeight);
+        float halfTableHeight = godPositionRenderer.bounds.size.y / 2;
+
+        godReferencePosition.transform.position = new Vector3(godReferencePosition.transform.position.x, humanReferenceFloor.transform.position.y - godPositionRenderer.bounds.center.y - halfTableHeight - 0.1f, godReferencePosition.transform.position.z);
+        godReferenceFloor.transform.position = new Vector3(godReferenceFloor.transform.position.x, godPositionRenderer.bounds.center.y - halfTableHeight, godReferenceFloor.transform.position.z);
     }
 
     void Awake()
