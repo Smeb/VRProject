@@ -12,13 +12,12 @@ public class PlayerController : MonoBehaviour
 
     WandController activeTouchpadController;
     public float walkingSpeed;
-    string locomotion = "walk-in-place";
+    public string locomotion = "walk-in-place";
     Vector3 lastPosition;
     float velocity;
 
     [SerializeField] float headPosition = 1.65f;
-    float wallHeight = 8f;
-    float headOffset = 0.03f;
+    float headOffset = 0.1f;
 
     public GameObject godReferencePosition, godReferenceFloor, humanReferenceFloor, humanReferencePosition;
     int godScale = 25, godForceScale = 8;
@@ -111,6 +110,7 @@ public class PlayerController : MonoBehaviour
     {
         SteamVR_Camera camera = cameraRig.GetComponentInChildren<SteamVR_Camera>();
         
+        // TODO: Adjust for forceScale parameter when moving user
         if (locomotion == "walk-in-place" &&
             activeTouchpadController &&
             camera.head.localPosition.y > headPosition - headOffset)

@@ -12,7 +12,7 @@ AnimatorController:
     m_Type: 9
     m_DefaultFloat: 0
     m_DefaultInt: 0
-    m_DefaultBool: 0
+    m_DefaultBool: 1
     m_Controller: {fileID: 0}
   - m_Name: TimeSinceWave
     m_Type: 1
@@ -60,9 +60,6 @@ AnimatorStateTransition:
   - m_ConditionMode: 3
     m_ConditionEvent: TimeSinceWave
     m_EventTreshold: 5
-  - m_ConditionMode: 1
-    m_ConditionEvent: PlayerGaze
-    m_EventTreshold: 0
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: 1102808089194525490}
   m_Solo: 0
@@ -161,7 +158,7 @@ AnimatorStateMachine:
   m_ChildStates:
   - serializedVersion: 1
     m_State: {fileID: 1102729583645787630}
-    m_Position: {x: 348, y: 120, z: 0}
+    m_Position: {x: 348, y: 108, z: 0}
   - serializedVersion: 1
     m_State: {fileID: 1102808089194525490}
     m_Position: {x: 348, y: -24, z: 0}
