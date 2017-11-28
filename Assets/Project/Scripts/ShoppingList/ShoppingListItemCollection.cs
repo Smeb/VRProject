@@ -27,14 +27,19 @@ public class ShoppingListItemCollection : MonoBehaviour {
 
     public void ClearAll()
     {
-
+        for (int i = 0; i < slots.Length; i++)
+        {
+            slots[i].ClearItem();
+        }
+        freeSlotIndex = 0;
     }
 
     public void ClearLast()
     {
-        if (freeSlotIndex >= 0)
+        if (freeSlotIndex > 0)
         {
-            slots[freeSlotIndex--].ClearItem();
+            freeSlotIndex--;
+            slots[freeSlotIndex].ClearItem();
         }
     }
 
@@ -43,13 +48,22 @@ public class ShoppingListItemCollection : MonoBehaviour {
         {
             AddItem(55);
         }
-	}
+        if (Input.GetKeyDown(KeyCode.A))
+        {
+            ClearAll();
+        }
+        if (Input.GetKeyDown(KeyCode.B))
+        {
+            ClearLast();
+        }
+    }
 
 	public void AddItem(int code){
         if (freeSlotIndex < slots.Length)
         {
             Sprite spriteIcon = iconMap.GetIconPath(code);
-            slots[freeSlotIndex++].AddItem(spriteIcon);
+            slots[freeSlotIndex].AddItem(spriteIcon);
+            freeSlotIndex++;
         }
 	}
 }

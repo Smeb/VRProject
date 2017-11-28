@@ -7,6 +7,8 @@ public class ShoppingListItem : MonoBehaviour {
 	public bool ticked;
 
     private Sprite background;
+    private Color backgroundColor;
+
     private Image imageBox;
     private Image tickImg;
 
@@ -26,11 +28,16 @@ public class ShoppingListItem : MonoBehaviour {
 
     public void ClearItem()
     {
-        imageBox.sprite = background;
+        if (background != null)
+        {
+            imageBox.sprite = background;
+            imageBox.color = backgroundColor;
+        }
     }
 
 	public void AddItem(Sprite iconSprite){
         background = imageBox.sprite;
+        backgroundColor = imageBox.color;
 		imageBox.sprite = iconSprite;
         imageBox.color = UpdateColorAlpha(imageBox, 1);
 	}

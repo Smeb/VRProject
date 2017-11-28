@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -42,9 +42,9 @@ public class ShoppingListController : MonoBehaviour {
     void Update () {
 		float angle = Vector3.Dot (this.transform.forward, Camera.main.transform.forward);
 
-        if (angle < -0.71 && !isVisible) {
+        if (angle > 0.71 && !isVisible) {
             isVisible = true;
-        } else if (angle > -0.69 && isVisible) {
+        } else if (angle < 0.69 && isVisible) {
             isVisible = false;
         }
         ToggleVisibility();
