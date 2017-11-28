@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Wave : StateMachineBehaviour {
-    public AvatarAnimator avatarAnimator;
 	// OnStateEnter is called when a transition starts and the state machine starts to evaluate this state
-	override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
-        avatarAnimator.lastWave = Time.time;
+	override public void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
+        animator.SetFloat("LastWave", Time.time);
 	}
     
 	// OnStateUpdate is called on each Update frame between OnStateEnter and OnStateExit callbacks

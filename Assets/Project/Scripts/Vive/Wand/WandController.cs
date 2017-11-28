@@ -145,13 +145,13 @@ public partial class WandController : Owner
         }
     }
 
-    private void ChangeStateHandler()
+    private void ChangeStateHandler(CameraState state)
     {
-        if (playerController.activeState is HumanState)
+        if (state is HumanState)
         {
             HumanStateChangeHandler();
         }
-        else if (playerController.activeState is CameraState)
+        else if (state is CameraState)
         {
             GodStateChangeHandler();
         }

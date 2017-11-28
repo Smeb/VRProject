@@ -7,7 +7,7 @@ public class PersistentSceneManager : MonoBehaviour {
     string previousScene;
 
 	void Start () {
-        LoadLevel("Config");
+        LoadLevel("Tutorial");
 	}
 
     public void LoadLevel (string name)

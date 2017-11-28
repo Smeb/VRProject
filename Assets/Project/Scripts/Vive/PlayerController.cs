@@ -7,6 +7,9 @@ public class PlayerController : MonoBehaviour
 {
     public GameObject cameraRig;
 
+    public GameObject playerBody;
+    public ContainerController[] inventories;
+
     WandController activeTouchpadController;
     public float walkingSpeed;
     string locomotion = "walk-in-place";
@@ -24,7 +27,7 @@ public class PlayerController : MonoBehaviour
     private CameraState m_activeState;
     private int touchpadIndex = -1;
 
-    public delegate void ChangeState();
+    public delegate void ChangeState(CameraState newState);
     public event ChangeState OnChangeState;
 
     public CameraState activeState
@@ -44,7 +47,7 @@ public class PlayerController : MonoBehaviour
 
                 if (OnChangeState != null)
                 {
-                    OnChangeState();
+                    OnChangeState(m_activeState);
                 }
 
                 UpdateCamera(m_activeState);
@@ -73,7 +76,16 @@ public class PlayerController : MonoBehaviour
         humanState = new HumanState(cameraRig, humanReferencePosition, humanReferenceFloor, 1, 1);
         godState = new GodState(godReferencePosition, godReferenceFloor, godScale, godForceScale);
         activeState = humanState;
+        SetInventories();
         UpdateCamera(activeState);
+    }
+
+    void SetInventories()
+    {
+        foreach (PlayerContainer container in inventories)
+        {
+            container.ClearItem();
+        }
     }
 
     void SetGodFloorAndPosition()
@@ -92,11 +104,13 @@ public class PlayerController : MonoBehaviour
     void Awake()
     {
         SceneManager.sceneLoaded += OnSceneLoad;
+        inventories = GetComponentsInChildren<ContainerController>();
     }
 
     private void Update()
     {
         SteamVR_Camera camera = cameraRig.GetComponentInChildren<SteamVR_Camera>();
+        
         if (locomotion == "walk-in-place" &&
             activeTouchpadController &&
             camera.head.localPosition.y > headPosition - headOffset)
@@ -107,8 +121,10 @@ public class PlayerController : MonoBehaviour
             Vector3 moveDirection = activeTouchpadController.transform.rotation * Vector3.forward;
             moveDirection = new Vector3(moveDirection.x, 0, moveDirection.z).normalized;
             Vector3 move = moveDirection * velocity * Time.deltaTime;
-            transform.position += move;
+            cameraRig.transform.position += move;
         }
+        playerBody.transform.position = new Vector3(camera.transform.position.x, camera.transform.position.y - 0.3f, camera.transform.position.z);
+        playerBody.transform.eulerAngles = new Vector3(playerBody.transform.eulerAngles.x, camera.transform.eulerAngles.y, playerBody.transform.eulerAngles.z);
         lastPosition = camera.head.localPosition;
     }
 
@@ -190,6 +206,7 @@ public class PlayerController : MonoBehaviour
     {
         SteamVR_Camera camera = cameraRig.GetComponentInChildren<SteamVR_Camera>();
         headPosition = camera.head.localPosition.y;
+        SetInventories();
         return headPosition;
     }
 }
