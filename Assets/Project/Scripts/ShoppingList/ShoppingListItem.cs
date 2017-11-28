@@ -1,41 +1,46 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class ShoppingListItem : MonoBehaviour {
-
-	// Use this for initialization
-
-
-	public bool filled;
-
 	public bool ticked;
 
-	public Image imageBox;
-	public Image tickImg;
+    private Sprite background;
+    private Image imageBox;
+    private Image tickImg;
 
-	void start(){
-		filled = false;
+	void Start()
+    {
 		ticked = false;
+        imageBox = transform.Find("ImagePlaceHolder").GetComponent<Image>();
+        tickImg = transform.Find("Tick").GetComponent<Image>();
+    }
 
-	}
+    public Color UpdateColorAlpha(Image image, float alpha)
+    {
+        Color color = image.color;
+        color.a = alpha;
+        return color;
+    }
+
+    public void ClearItem()
+    {
+        imageBox.sprite = background;
+    }
 
 	public void AddItem(Sprite iconSprite){
-
+        background = imageBox.sprite;
 		imageBox.sprite = iconSprite;
-
-		Color c = imageBox.color;
-		c.a = 1; 
-
-		imageBox.color = c; 
-
+        imageBox.color = UpdateColorAlpha(imageBox, 1);
 	}
 
-	public void activateTick(){
-		
-		Color c = tickImg.color;
-		c.a = 1;
-		tickImg.color = c;
-	}
+    public void UntickBox()
+    {
+        tickImg.color = UpdateColorAlpha(tickImg, 0);
+    }
+	public void TickBox()
+    {
+        tickImg.color = UpdateColorAlpha(tickImg, 1);
+    }
 }

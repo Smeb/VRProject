@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
@@ -8,7 +8,7 @@ public class ShoppingListItemCollection : MonoBehaviour {
 
 
 	[SerializeField] private ShoppingListItem[] slots;
-	public int itemCount;
+    private int freeSlotIndex = 0;
 	public IconMap iconMap;
 	public GameObject BGPanel;
 	public bool active;
@@ -19,15 +19,10 @@ public class ShoppingListItemCollection : MonoBehaviour {
 
 	void Start () {
 		slots = this.GetComponentsInChildren<ShoppingListItem> ();
-		itemCount = 0;
-		iconMap = new IconMap (); 
+		iconMap = new IconMap(); 
         
 		int[] itemsToCheck = { 55, 55, 55 };
-		itemChecker = new ItemChecker (itemsToCheck);
-
-		this.transform.position = parentGO.transform.position;
-
-
+		itemChecker = new ItemChecker(itemsToCheck);
 	}
 
     public void ClearAll()
@@ -37,51 +32,26 @@ public class ShoppingListItemCollection : MonoBehaviour {
 
     public void ClearLast()
     {
+        if (freeSlotIndex >= 0)
+        {
+            slots[freeSlotIndex--].ClearItem();
+        }
     }
 
-	// Update is called once per frame
 	void Update () {
-
-		//
-		//		if (Input.GetKeyDown (KeyCode.Tab)) {
-		//			BGPanel.SetActive (true); 
-		//		}
-		//
-		//		if (Input.GetKeyUp (KeyCode.Tab)) {
-		//			BGPanel.SetActive (false); 
-		//		}
-
         if(Input.GetKeyDown(KeyCode.Space))
         {
             AddItem(55);
         }
-
-
-
 	}
 
 	public void AddItem(int code){
-		// Get the product code from the item
-
-		//ProductCode code = newItem.GetComponent<ProductCode> () as ProductCode;
-		//print (code.Code);
-		if (slots [itemCount].filled == false) {
-			print ("free slot");
-			Sprite spriteIcon = iconMap.GetIconPath (code);
-			slots [itemCount].AddItem (spriteIcon);
-
-			//if (itemChecker.isTickable (code)) {
-			//	print ("activating tick"); 
-			//	slots [itemCount].activateTick (); 
-			//}
-
-			itemCount++;
-		} else {
-			print ("ERROR, out of space in invent?"); 
-		}
-
+        if (freeSlotIndex < slots.Length)
+        {
+            Sprite spriteIcon = iconMap.GetIconPath(code);
+            slots[freeSlotIndex++].AddItem(spriteIcon);
+        }
 	}
-
 }
 
 
@@ -116,8 +86,6 @@ public class ItemChecker{
 		}
 
 	}
-		
-
 }
 
 public class IconMap :MonoBehaviour  {
