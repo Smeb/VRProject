@@ -41,6 +41,7 @@ public class AvatarAnimator : MonoBehaviour {
             animationController.SetBool("PlayerGaze", false);
         }
     }
+		
 
     // Update is called once per frame
     void Update () {

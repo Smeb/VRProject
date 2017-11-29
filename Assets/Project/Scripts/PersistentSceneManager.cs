@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class PersistentSceneManager : MonoBehaviour {
     string previousScene;
-    public string startScene = "Config";
+    public string startScene = "Tutorial";
 
 	void Start () {
         LoadLevel(startScene);
