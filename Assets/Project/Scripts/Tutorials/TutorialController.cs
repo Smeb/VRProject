@@ -6,13 +6,9 @@ using UnityEngine.UI;
 public class TutorialController : MonoBehaviour {
 
 
-	//Dialogue Parent 
+	//Canvas elements
 	public GameObject canvasUI;
-
-	//Dialogue text
 	public Text canvasText;
-
-	// Button
 	public Button nextButton;
 	public Button prevButton;
 
@@ -20,18 +16,15 @@ public class TutorialController : MonoBehaviour {
 	public int instructionIndex; 
 
 
-	//Host
 	public GameObject host;
+	public Animator animator; 
 
+	public PlayerController playerController;
+	public ShoppingListItemCollection shoppingListItemCollection; 
 
-
-	//Camera State
-	//public CameraSate cameraState;
-
-	public AvatarAnimator avatarAnimator;
-
-	public bool isPicked = false;
-	public bool isInserted = false;
+	public bool hasBeenGod = false;
+	public bool hasItemsInInventory = false;
+	public bool allItemsScanned = false; 
 
 	// States
 	public enum TutorialState {
@@ -39,10 +32,7 @@ public class TutorialController : MonoBehaviour {
 		stepTwo, // teleportation
 		stepThree, // scanning items into shopping list
 		stepFour, // put items into inventory using predefined shopping list 
-		stepFive, // emptying inventory into final till
-		stepSix, 
-		stepSeven,
-		stepEight
+		stepFive // emptying inventory into final till
 	}
 
 	public TutorialState tutorialState;
@@ -61,20 +51,19 @@ public class TutorialController : MonoBehaviour {
 		nextButton.onClick.AddListener(() => Next());
 		prevButton.onClick.AddListener(() => Previous());
 
+
+		prevButton.interactable = false;
+		nextButton.interactable = true; 
+
+		animator = host.GetComponent<Animator> ();
+
 		dialogues = new Dictionary<TutorialState, string[]> ();
-
 		populateDialogues ();
-
-
 		UpdateText (); 
-
-
-
+	
 
 	}
-
-
-	
+		
 	// Update is called once per frame
 	void Update () {
 
@@ -86,52 +75,49 @@ public class TutorialController : MonoBehaviour {
 		switch (this.tutorialState) {
 
 		case TutorialState.stepOne:
-
-
 			if (Vector3.Distance (this.transform.position, host.transform.position) < 3) {
-				//canvasText.text = "Nice! Press the menu button to move to switch in and out of god mode";
+				UpdateState(); 
+				UpdateText ();
+
+
+			}
+			break;
+
+		case TutorialState.stepTwo:
+			if (playerController.activeState is GodState) {
+				hasBeenGod = true;
+				// scale up host
+			}
+			if (hasBeenGod && Vector3.Distance (this.transform.position, host.transform.position) < 3) {
+				UpdateState (); 
+				UpdateText (); 
+			}
+			break;
+
+		case TutorialState.stepThree:
+			if (shoppingListItemCollection.itemCount == 3) {
 				UpdateState(); 
 				UpdateText (); 
 			}
 			break;
 
-		case TutorialState.stepTwo:
-
-
-			UpdateText (); 
-		
-			/*
-			if (cameraState.GetType () == typeof(GodState)) {
-
-				// scale up host
-
-			}
-
-			
-			*/
-
-			break;
-
-		case TutorialState.stepThree:
-
-			if (isPicked) {
-				tutorialState++;
-			}
-
-			break;
-
 		case TutorialState.stepFour:
-
-			if (isInserted) {
-				tutorialState++;
+			if (hasItemsInInventory) {
+				UpdateState(); 
+				UpdateText (); 
 			}
-
 			break;
 
+		case TutorialState.stepFive:
+			if (allItemsScanned) {
+				UpdateState (); 
+				UpdateText (); 
+			}
+			break;
+		
 		default: 
 			break;
 	
-
 		}
 	}
 		
@@ -186,12 +172,18 @@ public class TutorialController : MonoBehaviour {
 		string[] stepTwoInstructions = new string[2];
 
 		// Step Two
-		stepTwoInstructions[0] = "Now teleport to NPC \n 1) Press the menu button, you will see an overview of the environment. ";
-		stepTwoInstructions [1] = "2) Your position is indicated by a statue. Grab and drag it to your target location. \n3) Press the menu button again to be teleported.";
+		/* 
+		 * At the end of step one, npc runs to X position and turns around, and starts waving
+		 * UI box stays at current position
+		 */
+		stepTwoInstructions[0] = "Now teleport to the NPC \n This is done by:";
+		stepTwoInstructions [1] = "1) Press the menu button, you will see an overview of the environment. \n 2) Your position is indicated by a statue. Grab and drag it to your target location. \n3) Press the menu button again to be teleported.";
 		dialogues.Add (TutorialState.stepTwo, stepTwoInstructions);
 
 
 		// Step Three
+
+		// NPC doesn't do anything, UI moves to host
 		string[] stepThreeInstructions = new string[3];
 		stepThreeInstructions [0] = "Tilt the palm of your left hand to face you. This is your shopping list.";
 		stepThreeInstructions [1] = "Use the laser pointer to scan items into the shopping list. Point the laser on a target item and click to scan.";
@@ -200,17 +192,34 @@ public class TutorialController : MonoBehaviour {
 
 
 		// Step Four
+		// 
 		string[] stepFourInstructions = new string[3];
 		stepFourInstructions [0] = "Time for a scavenger hunt! You need to find items in your updated shopping list and place them in your inventory.";
 		stepFourInstructions [1] = "Items can be placed in your inventory by dragging them into the translucent spheres to your left and right.";
-		stepFourInstructions [2] = "Now search for the six items in your shopping list.";
+		stepFourInstructions [2] = "Now search for the six items in your shopping list! Come back to me once you're done.";
 		dialogues.Add (TutorialState.stepFour, stepFourInstructions);
 
 		// Step Five 
+		// Host to till , UI follows
 		string[] stepFiveInstructions = new string[1];
 		stepFiveInstructions [0] = "Great job! Now go to the checkout till and take items from your inventory and place them on the checkout till.";
 		dialogues.Add (TutorialState.stepFive, stepFiveInstructions);
 
 
+	}
+
+	public void MatchTarget(Vector3 matchPosition, Quaternion matchRotation, AvatarTarget target, MatchTargetWeightMask weightMask, float normalisedStartTime, float normalisedEndTime)
+	{
+		animator = GetComponent<Animator>();
+
+		if (animator.isMatchingTarget)
+			return;
+
+		float normalizeTime = Mathf.Repeat(animator.GetCurrentAnimatorStateInfo(0).normalizedTime, 1f);
+
+		if (normalizeTime > normalisedEndTime)
+			return;
+
+		animator.MatchTarget(matchPosition, matchRotation);
 	}
 }
