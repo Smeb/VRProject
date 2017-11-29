@@ -5,7 +5,7 @@ using UnityEngine;
 public abstract class Owner : MonoBehaviour
 {
     private Property m_ownedItem;
-    protected Property ownedItem
+    protected virtual Property ownedItem
     {
         get
         {

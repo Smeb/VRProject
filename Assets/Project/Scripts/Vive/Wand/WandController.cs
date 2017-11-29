@@ -1,9 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI;
 
 [RequireComponent(typeof(FixedJoint))]
 public partial class WandController : Owner
@@ -18,15 +16,12 @@ public partial class WandController : Owner
     private SteamVR_Controller.Device controller {  get { return SteamVR_Controller.Input((int)trackedObject.index); } }
     private SteamVR_TrackedObject trackedObject;
 
-    // Button press timing
+    // Controller button press timing
     private Timer timer;
 
     // Item ownership mechanisms
-    private Button button;
     private ContainerController container;
     private FixedJoint fixedJoint;
-    private EventSystem eventSystem;
-    private SteamVR_LaserPointer pointer;
 
     // Propagating transforms of tracked controller
     public Transform origin { get { return trackedObject.origin; } }
@@ -84,24 +79,16 @@ public partial class WandController : Owner
         timer = new Timer();
         trackedObject = GetComponent<SteamVR_TrackedObject>();
         fixedJoint = GetComponent<FixedJoint>();
-        pointer = GetComponent<SteamVR_LaserPointer>();
+        pointer = GetComponent<LaserPointer>();
 
-        FindEventSystem();
+        CheckForPointerInteractables();
         SceneManager.sceneLoaded += OnSceneLoad;
-    }
-
-    void FindEventSystem()
-    {
-        if (pointer)
-        {
-            eventSystem = GameObject.Find("EventSystem").GetComponent<EventSystem>();
-        }
     }
 
     void OnSceneLoad(Scene scene, LoadSceneMode mode)
     {
         if (scene.name == "Persistent") return;
-        FindEventSystem();
+        CheckForPointerInteractables();
     }
 
     private void OnEnable()
@@ -110,6 +97,11 @@ public partial class WandController : Owner
         {
             pointer.PointerIn += OnPointerEnter;
             pointer.PointerOut += OnPointerExit;
+
+            playerController.ShoppingListOpen += OnShoppingListOpen;
+            playerController.ShoppingListClose += OnShoppingListClose;
+            playerController.ScanModeOn += OnScanModeOn;
+            playerController.ScanModeOff += OnScanModeOff;
         }
         playerController.OnChangeState += ChangeStateHandler;
         playerController.RegisterWand(this);
@@ -119,30 +111,16 @@ public partial class WandController : Owner
     {
         if (pointer != null)
         {
-            pointer.PointerIn += OnPointerEnter;
-            pointer.PointerOut += OnPointerExit;
+            pointer.PointerIn -= OnPointerEnter;
+            pointer.PointerOut -= OnPointerExit;
+
+            playerController.ShoppingListOpen -= OnShoppingListOpen;
+            playerController.ShoppingListClose-= OnShoppingListClose;
+            playerController.ScanModeOn -= OnScanModeOn;
+            playerController.ScanModeOff -= OnScanModeOff;
         }
         playerController.OnChangeState -= ChangeStateHandler;
         playerController.DeregisterWand(this);
-    }
-
-    public void OnPointerEnter(object sender, PointerEventArgs e)
-    {
-        Button buttonTarget = e.target.GetComponent<Button>();
-        if (buttonTarget != null && buttonTarget.interactable)
-        {
-            buttonTarget.Select();
-            button = buttonTarget;
-        }
-    }
-
-    public void OnPointerExit(object sender, PointerEventArgs e)
-    {
-        if (button != null)
-        {
-            eventSystem.SetSelectedGameObject(null);
-            button = null;
-        }
     }
 
     private void ChangeStateHandler(CameraState state)
@@ -164,7 +142,57 @@ public partial class WandController : Owner
             return;
         }
 
-        // Touchpad controls
+        TouchpadButtonUpdate();
+        
+        // Viewpoint controls
+        if (controller.GetPressDown(toggleViewpoint))
+        {
+            timer.StartTimer(toggleViewpoint);
+        }
+
+        // Trigger controls
+        TriggerUpdate();
+
+        // Conditional Updates
+        if (playerController.activeState is HumanState)
+        {
+            HumanUpdate();
+        }
+        else if (playerController.activeState is GodState)
+        {
+            GodUpdate();
+        }
+    }
+
+    private void TriggerUpdate()
+    {
+        if (ownedItem == null && !scanModeOn)
+        {
+            SetClosestItem();
+        }
+
+        if (controller.GetPressDown(triggerButton))
+        {
+            if (shoppingListOpen && scanModeOn && button == null)
+            {
+                if (currentProduct != null)
+                {
+                    playerController.OnAddItem(currentProduct.Code);
+                }
+            }
+            else if (button != null)
+            {
+                button.onClick.Invoke();
+            }
+            else if (!scanModeOn && closestItem)
+            {
+                GrabItem();
+            }
+        }
+    }
+
+    public void TouchpadButtonUpdate()
+    {
         if (controller.GetTouchUp(touchpadButton))
         {
             if (OnTouchpadRelease != null)
@@ -184,40 +212,6 @@ public partial class WandController : Owner
         if (controller.GetTouch(touchpadButton))
         {
             OnTouchpadUpdate(this);
-        }
-
-        // Viewpoint controls
-        if (controller.GetPressDown(toggleViewpoint))
-        {
-            timer.StartTimer(toggleViewpoint);
-        }
-
-        // Trigger controls
-        if (ownedItem == null)
-        {
-            SetClosestItem();
-        }
-
-        if (controller.GetPressDown(triggerButton))
-        {
-            if (button != null)
-            {
-                button.onClick.Invoke();
-            }
-            else if (closestItem)
-            {
-                GrabItem();
-            }
-        }
-
-        // Conditional Updates
-        if (playerController.activeState is HumanState)
-        {
-            HumanUpdate();
-        }
-        else if (playerController.activeState is GodState)
-        {
-            GodUpdate();
         }
     }
 

@@ -1,20 +1,34 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+public delegate void AddItemDelegate(int code);
+
 public class PlayerController : MonoBehaviour
 {
     public GameObject cameraRig;
+    public event Action ShoppingListOpen, ShoppingListClose;
+    public event Action ScanModeOn, ScanModeOff;
+    public event AddItemDelegate AddItem;
+    public void OnAddItem(int code)
+    {
+        if (AddItem != null)
+        {
+            AddItem(code);
+        }
+    }
 
     public GameObject playerBody;
     public ContainerController[] inventories;
-
+    
     WandController activeTouchpadController;
     public float walkingSpeed;
     public string locomotion = "walk-in-place";
     Vector3 lastPosition;
     float velocity;
+    float turnVelocity;
 
     [SerializeField] float headPosition = 1.65f;
     float headOffset = 0.1f;
@@ -103,7 +117,7 @@ public class PlayerController : MonoBehaviour
     void Awake()
     {
         SceneManager.sceneLoaded += OnSceneLoad;
-        inventories = GetComponentsInChildren<ContainerController>();
+        inventories = GetComponentsInChildren<PlayerContainer>();
     }
 
     private void Update()
@@ -123,8 +137,7 @@ public class PlayerController : MonoBehaviour
             Vector3 move = moveDirection * velocity * Time.deltaTime;
             cameraRig.transform.position += move;
         }
-        playerBody.transform.position = new Vector3(camera.transform.position.x, camera.transform.position.y - 0.3f, camera.transform.position.z);
-        playerBody.transform.eulerAngles = new Vector3(playerBody.transform.eulerAngles.x, camera.transform.eulerAngles.y, playerBody.transform.eulerAngles.z);
+
         lastPosition = camera.head.localPosition;
     }
 
@@ -133,6 +146,15 @@ public class PlayerController : MonoBehaviour
         controller.OnTouchpadPress += TouchpadPressHandler;
         controller.OnTouchpadRelease += TouchpadReleaseHandler;
         controller.OnTouchpadUpdate += TouchpadUpdateHandler;
+
+        ShoppingListController shoppingListController = controller.GetComponentInChildren<ShoppingListController>();
+        if (shoppingListController)
+        {
+            shoppingListController.ShoppingListOpen += OnShoppingListOpen;
+            shoppingListController.ShoppingListClose += OnShoppingListClose;
+            shoppingListController.ScanModeOn += OnScanModeOn;
+            shoppingListController.ScanModeOff += OnScanModeOff;
+        }
     }
 
     public void DeregisterWand(WandController controller)
@@ -140,6 +162,47 @@ public class PlayerController : MonoBehaviour
         controller.OnTouchpadPress -= TouchpadPressHandler;
         controller.OnTouchpadRelease -= TouchpadReleaseHandler;
         controller.OnTouchpadUpdate -= TouchpadUpdateHandler;
+
+        ShoppingListController shoppingListController = controller.GetComponentInChildren<ShoppingListController>();
+        if (shoppingListController)
+        {
+            shoppingListController.ShoppingListOpen -= OnShoppingListOpen;
+            shoppingListController.ShoppingListClose -= OnShoppingListClose;
+            shoppingListController.ScanModeOn -= OnScanModeOn;
+            shoppingListController.ScanModeOff -= OnScanModeOff;
+        }
+    }
+
+    private void OnShoppingListOpen()
+    {
+        if (ShoppingListOpen != null)
+        {
+            ShoppingListOpen();
+        }
+    }
+
+    private void OnShoppingListClose()
+    {
+        if (ShoppingListClose != null)
+        {
+            ShoppingListClose();
+        }
+    }
+
+    private void OnScanModeOn()
+    {
+        if (ScanModeOn != null)
+        {
+            ScanModeOn();
+        }
+    }
+
+    private void OnScanModeOff()
+    {
+        if (ScanModeOff != null)
+        {
+            ScanModeOff();
+        }
     }
 
     private void TouchpadUpdateHandler(WandController controller)

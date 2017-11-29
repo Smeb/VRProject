@@ -102,7 +102,7 @@ public class ItemChecker{
 	}
 }
 
-public class IconMap :MonoBehaviour  {
+public class IconMap : MonoBehaviour  {
 
 
 	private Dictionary<int, Sprite> iconDict; 
