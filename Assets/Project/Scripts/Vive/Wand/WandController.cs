@@ -36,7 +36,6 @@ public partial class WandController : Owner
     public event TouchpadUpdate OnTouchpadUpdate;
 
     // Object highlighting and selection
-    private static Dictionary<Material, Material> highlights;
     private HashSet<GameObject> hoveredInteractables = new HashSet<GameObject>();
 
     [SerializeField]
@@ -49,13 +48,14 @@ public partial class WandController : Owner
             {
                 if (m_closestItem)
                 {
-                    SwapTextures(m_closestItem);
+                    Unhighlight(m_closestItem);
                 }
+
+                m_closestItem = value;
                 if (value)
                 {
-                    SwapTextures(value);
+                    Highlight(value);
                 }
-                m_closestItem = value;
             }
         }
         get
@@ -69,11 +69,6 @@ public partial class WandController : Owner
         if (playerController == null)
         {
             playerController = GetComponentInParent<PlayerController>();
-        }
-
-        if (highlights == null)
-        {
-            highlights = new Dictionary<Material, Material>();
         }
 
         timer = new Timer();
@@ -234,32 +229,48 @@ public partial class WandController : Owner
         ownedItem.GetComponent<Throwable>().ThrowObject(playerController.activeState.forceScale);
     }
 
-
-    void SwapTextures(GameObject gameObject)
+    void Highlight(GameObject gameObject)
     {
         TextureMapping textureMapping = gameObject.GetComponent<TextureMapping>();
         Renderer renderer = gameObject.GetComponent<Renderer>();
         if (textureMapping)
+        {
+            textureMapping.references++;
+        }
+        else
+        {
+            TextureMapping mapping = gameObject.AddComponent<TextureMapping>();
+            mapping.references = 1;
+            mapping.previousMaterial = renderer.material;
+
+            if (gameObject.GetComponent<ProductCode>())
+            {
+                renderer.material = TextureController.supermarketHighlight;
+            }
+            else
+            {
+                renderer.material = TextureController.statueHighlight;
+            }
+        }
+    }
+
+    void Unhighlight(GameObject gameObject)
+    {
+        TextureMapping textureMapping = gameObject.GetComponent<TextureMapping>();
+        if (textureMapping == null)
+        {
+            return;
+        }
+
+        Renderer renderer = gameObject.GetComponent<Renderer>();
+        if (textureMapping.references == 1)
         {
             renderer.material = textureMapping.previousMaterial;
             Destroy(textureMapping);
         }
         else
         {
-            Material original = gameObject.GetComponent<Renderer>().material;
-            Material highlight;
-            try
-            {
-                highlight = highlights[original];
-            }
-            catch
-            {
-                highlight = new Material(original);
-                highlight.shader = Shader.Find("Custom/OnHoverOutline");
-                highlights[original] = highlight;
-            }
-            renderer.material = highlight;
-            gameObject.AddComponent<TextureMapping>().previousMaterial = original;
+            textureMapping.references--;
         }
     }
 
@@ -291,15 +302,19 @@ public partial class WandController : Owner
             GameObject lastClosestItem = closestItem;
             float minDistance = float.MaxValue;
             float distance;
+            GameObject newClosestItem = null;
+
             foreach (GameObject gameObject in hoveredInteractables)
             {
                 distance = (gameObject.transform.position - transform.position).sqrMagnitude;
                 if (distance < minDistance)
                 {
                     minDistance = distance;
-                    closestItem = gameObject;
+                    newClosestItem = gameObject;
+                    
                 }
             }
+            closestItem = newClosestItem;
         }
         else
         {
@@ -309,6 +324,7 @@ public partial class WandController : Owner
 
     private void OnTriggerEnter(Collider other)
     {
+        Debug.Log("Item entered trigger");
         if (playerController.activeState is HumanState)
         {
             if (other.gameObject.layer == LayerMask.NameToLayer("Grabbable"))

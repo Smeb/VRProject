@@ -6,9 +6,18 @@ using UnityEngine;
 public class PersistentSceneManager : MonoBehaviour {
     string previousScene;
     public string startScene = "Config";
+    public Material statueNormal;
+    public Material statueHighlight;
+    public Material supermarketNormal;
+    public Material supermarketHighlight;
+    
 
-	void Start () {
+    void Start () {
         LoadLevel(startScene);
+        TextureController.statueNormal = statueNormal;
+        TextureController.statueHighlight = statueHighlight;
+        TextureController.supermarketNormal = supermarketNormal;
+        TextureController.supermarketHighlight = supermarketHighlight;
 	}
 
     public void LoadLevel (string name)
