@@ -324,7 +324,6 @@ public partial class WandController : Owner
 
     private void OnTriggerEnter(Collider other)
     {
-        Debug.Log("Item entered trigger");
         if (playerController.activeState is HumanState)
         {
             if (other.gameObject.layer == LayerMask.NameToLayer("Grabbable"))

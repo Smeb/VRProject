@@ -9,7 +9,7 @@ public class ShoppingListController : MonoBehaviour {
     private PlayerController playerController;
     private SteamVR_Camera camera;
     private ShoppingListItemCollection shoppingListPanel;
-    private bool scannerToggled;
+    private bool scannerToggledOn;
     [SerializeField] private Button scanMode;
     private Text scanModeText;
     private bool isVisible;
@@ -32,23 +32,23 @@ public class ShoppingListController : MonoBehaviour {
 
     public void ScanModeToggle()
     {
-        if (scannerToggled)
+        if (scannerToggledOn)
         {
             if (ScanModeOff != null)
-            {
-                ScanModeOn();
-            }
-            scanModeText.text = "Disable Scan Mode";
-        }
-        else
-        {
-            if (ScanModeOn != null)
             {
                 ScanModeOff();
             }
             scanModeText.text = "Enable Scan Mode";
         }
-        scannerToggled = !scannerToggled;
+        else
+        {
+            if (ScanModeOn != null)
+            {
+                ScanModeOn();
+            }
+            scanModeText.text = "Disable Scan Mode";
+        }
+        scannerToggledOn = !scannerToggledOn;
     }
 
     private void OnEnable()
