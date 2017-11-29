@@ -6,26 +6,33 @@ using UnityEngine.UI;
 public class TutorialController : MonoBehaviour {
 
 
-	//Canvas elements
+	//Canvas elements 
 	public GameObject canvasUI;
-	public Text canvasText;
+	public Text canvasText; 
 	public Button nextButton;
 	public Button prevButton;
 
+	public int stateTest = 0;
 
+	//Instruction Pointer
 	public int instructionIndex; 
 
-
+	//NPC Reference
 	public GameObject host;
+
 	public Animator animator;
-	public GameObject target1;
+
+	// Position References 
+	public GameObject target1; //After Step 1
+
 
 	public PlayerController playerController;
 	public ShoppingListItemCollection shoppingListItemCollection; 
 
+	// Bool to check if the user has entered god mod atleast one
 	public bool hasBeenGod = false;
 	public bool hasItemsInInventory = false;
-	public bool allItemsScanned = false; 
+	public bool allItemsScanned = false;
 
 	// States
 	public enum TutorialState {
@@ -169,15 +176,14 @@ public class TutorialController : MonoBehaviour {
 
 		string[] stepOneInstructions = new string[2];
 
-		// Step One
+		// Step One -> Run on the spot
 		stepOneInstructions[0] = "Run on the spot to move towards me. Simple. Make sure your head bobs up and down.";
 		stepOneInstructions [1] = "Use your laser pointer to determine the direction";
 		dialogues.Add (TutorialState.stepOne, stepOneInstructions);
 
 
-		string[] stepTwoInstructions = new string[2];
-
-		// Step Two
+		// Step Two -> Teleportation
+		string[] stepTwoInstructions = new string[2]; 
 		/* 
 		 * At the end of step one, npc runs to X position and turns around, and starts waving
 		 * UI box stays at current position
@@ -187,8 +193,7 @@ public class TutorialController : MonoBehaviour {
 		dialogues.Add (TutorialState.stepTwo, stepTwoInstructions);
 
 
-		// Step Three
-
+		// Step Three -> Shoppping List
 		// NPC doesn't do anything, UI moves to host
 		string[] stepThreeInstructions = new string[3];
 		stepThreeInstructions [0] = "Tilt the palm of your left hand to face you. This is your shopping list.";
@@ -197,8 +202,7 @@ public class TutorialController : MonoBehaviour {
 		dialogues.Add (TutorialState.stepThree, stepThreeInstructions);
 
 
-		// Step Four
-		// 
+		// Step Four -> Inventory
 		string[] stepFourInstructions = new string[3];
 		stepFourInstructions [0] = "Time for a scavenger hunt! You need to find items in your updated shopping list and place them in your inventory.";
 		stepFourInstructions [1] = "Items can be placed in your inventory by dragging them into the translucent spheres to your left and right.";
@@ -206,7 +210,7 @@ public class TutorialController : MonoBehaviour {
 		dialogues.Add (TutorialState.stepFour, stepFourInstructions);
 
 		// Step Five 
-		// Host to till , UI follows
+		// 
 		string[] stepFiveInstructions = new string[1];
 		stepFiveInstructions [0] = "Great job! Now go to the checkout till and take items from your inventory and place them on the checkout till.";
 		dialogues.Add (TutorialState.stepFive, stepFiveInstructions);
