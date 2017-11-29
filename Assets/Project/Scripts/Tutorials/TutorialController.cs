@@ -17,7 +17,8 @@ public class TutorialController : MonoBehaviour {
 
 
 	public GameObject host;
-	public Animator animator; 
+	public Animator animator;
+	public GameObject target1;
 
 	public PlayerController playerController;
 	public ShoppingListItemCollection shoppingListItemCollection; 
@@ -84,6 +85,10 @@ public class TutorialController : MonoBehaviour {
 			break;
 
 		case TutorialState.stepTwo:
+
+			MoveHostToTarget (target1);
+
+			/*
 			if (playerController.activeState is GodState) {
 				hasBeenGod = true;
 				// scale up host
@@ -92,6 +97,7 @@ public class TutorialController : MonoBehaviour {
 				UpdateState (); 
 				UpdateText (); 
 			}
+			*/
 			break;
 
 		case TutorialState.stepThree:
@@ -208,18 +214,10 @@ public class TutorialController : MonoBehaviour {
 
 	}
 
-	public void MatchTarget(Vector3 matchPosition, Quaternion matchRotation, AvatarTarget target, MatchTargetWeightMask weightMask, float normalisedStartTime, float normalisedEndTime)
-	{
-		animator = GetComponent<Animator>();
 
-		if (animator.isMatchingTarget)
-			return;
-
-		float normalizeTime = Mathf.Repeat(animator.GetCurrentAnimatorStateInfo(0).normalizedTime, 1f);
-
-		if (normalizeTime > normalisedEndTime)
-			return;
-
-		animator.MatchTarget(matchPosition, matchRotation);
+	void MoveHostToTarget(GameObject target){
+		float step = 2.0f * Time.deltaTime;
+		host.transform.position = Vector3.MoveTowards(host.transform.position, target.transform.position, step);
 	}
+
 }
