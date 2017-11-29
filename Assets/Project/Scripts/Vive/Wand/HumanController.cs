@@ -10,9 +10,9 @@ public partial class WandController : Owner
         {
             if (ownedItem)
             {
-                if (container && !container.OwnsItem())
+                if (closestContainer && !closestContainer.OwnsItem())
                 {
-                    GiveItem(container);
+                    GiveItem(closestContainer);
                 }
                 else
                 {

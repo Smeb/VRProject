@@ -20,7 +20,6 @@ public partial class WandController : Owner
     private Timer timer;
 
     // Item ownership mechanisms
-    private ContainerController container;
     private FixedJoint fixedJoint;
 
     // Propagating transforms of tracked controller
@@ -37,6 +36,8 @@ public partial class WandController : Owner
 
     // Object highlighting and selection
     private HashSet<GameObject> hoveredInteractables = new HashSet<GameObject>();
+    private HashSet<GameObject> hoveredContainers = new HashSet<GameObject>();
+    private ContainerController closestContainer;
 
     [SerializeField]
     private GameObject m_closestItem;
@@ -138,7 +139,19 @@ public partial class WandController : Owner
         }
 
         TouchpadButtonUpdate();
-        
+        SetClosestContainer();
+
+        if (OwnsItem() && closestContainer && !closestContainer.OwnsItem())
+        {
+            float scale = closestContainer.FindItemScale(ownedItem);
+            ownedItem.transform.localScale *= scale;
+            ownedItem.transform.position = transform.position - GetComponent<SphereCollider>().center;
+        }
+        else if (OwnsItem())
+        {
+            ownedItem.transform.localScale = new Vector3(1, 1, 1);
+        }
+
         // Viewpoint controls
         if (controller.GetPressDown(toggleViewpoint))
         {
@@ -294,7 +307,6 @@ public partial class WandController : Owner
         closestItem = null;
     }
 
-
     void SetClosestItem()
     {
         if (hoveredInteractables.Count != 0)
@@ -322,6 +334,29 @@ public partial class WandController : Owner
         }
     }
 
+    void SetClosestContainer()
+    {
+        if (hoveredContainers.Count != 0)
+        {
+            float minDistance = float.MaxValue;
+            float distance;
+
+            foreach (GameObject gameObject in hoveredContainers)
+            {
+                distance = (gameObject.transform.position - transform.position).sqrMagnitude;
+                if (distance < minDistance)
+                {
+                    minDistance = distance;
+                    closestContainer = gameObject.GetComponent<ContainerController>();
+                }
+            }
+        }
+        else
+        {
+            closestContainer = null;
+        }
+    }
+
     private void OnTriggerEnter(Collider other)
     {
         if (playerController.activeState is HumanState)
@@ -332,7 +367,7 @@ public partial class WandController : Owner
             }
             else if (other.gameObject.layer == LayerMask.NameToLayer("Inventory"))
             {
-                container = other.GetComponent<ContainerController>();
+                hoveredContainers.Add(other.gameObject);
             }
         }
         else if (playerController.activeState is GodState)
@@ -352,7 +387,7 @@ public partial class WandController : Owner
         }
         else if (other.gameObject.layer == LayerMask.NameToLayer("Inventory"))
         {
-            container = null;
+            hoveredInteractables.Remove(other.gameObject);
         }
     }
 }
