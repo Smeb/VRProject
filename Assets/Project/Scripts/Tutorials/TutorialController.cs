@@ -179,11 +179,12 @@ public class TutorialController : MonoBehaviour {
 		canvasText.text = dialogues[tutorialState][instructionIndex];
 	}
 
-    public void ResetButtonState()
-    {
-        prevButton.interactable = false;
-        nextButton.interactable = true;
-    }
+	public void ResetButtonState()
+	{
+	prevButton.interactable = false;
+	nextButton.interactable = true;
+	}
+	
 	public void UpdateState(){
 		tutorialState++;
 		instructionIndex = 0;
@@ -191,18 +192,20 @@ public class TutorialController : MonoBehaviour {
         ResetButtonState(); 
 	}
 
+
 	void populateDialogues(){
 
 		string[] stepOneInstructions = new string[2];
 
-		// Step One -> Run on the spot
+		// Step One
 		stepOneInstructions[0] = "Run on the spot to move towards me. Simple. Make sure your head bobs up and down.";
 		stepOneInstructions [1] = "Use your laser pointer to determine the direction";
 		dialogues.Add (TutorialState.stepOne, stepOneInstructions);
 
 
-		// Step Two -> Teleportation
-		string[] stepTwoInstructions = new string[2]; 
+		string[] stepTwoInstructions = new string[2];
+
+		// Step Two
 		/* 
 		 * At the end of step one, npc runs to X position and turns around, and starts waving
 		 * UI box stays at current position
@@ -212,24 +215,26 @@ public class TutorialController : MonoBehaviour {
 		dialogues.Add (TutorialState.stepTwo, stepTwoInstructions);
 
 
-		// Step Three -> Shoppping List
+		// Step Three
+
 		// NPC doesn't do anything, UI moves to host
 		string[] stepThreeInstructions = new string[3];
-		stepThreeInstructions [0] = "Tilt the palm of your left hand to face you. This is your shopping list.";
-		stepThreeInstructions [1] = "Use the laser pointer to scan items into the shopping list. Point the laser on a target item and click to scan.";
+		stepThreeInstructions [0] = "Tilt the palm of your left hand to face you. This is your shopping list and inventory.";
+		stepThreeInstructions [1] = "Click \"Enable scanning mode\". \n Use the laser pointer to scan items into the shopping list. Point the laser on a target item and click to scan.  Click \"Disable Scanning Mode\".";
 		stepThreeInstructions [2] = "Now scan 3 items.";
 		dialogues.Add (TutorialState.stepThree, stepThreeInstructions);
 
 
-		// Step Four -> Inventory
+		// Step Four
+		// 
 		string[] stepFourInstructions = new string[3];
 		stepFourInstructions [0] = "Time for a scavenger hunt! You need to find items in your updated shopping list and place them in your inventory.";
-		stepFourInstructions [1] = "Items can be placed in your inventory by dragging them into the translucent spheres to your left and right.";
+		stepFourInstructions [1] = "Items can be placed in your inventory by dragging them into the translucent spheres when you tilt your left hand.";
 		stepFourInstructions [2] = "Now search for the six items in your shopping list! Come back to me once you're done.";
 		dialogues.Add (TutorialState.stepFour, stepFourInstructions);
 
 		// Step Five 
-		// 
+		// Host to till , UI follows
 		string[] stepFiveInstructions = new string[1];
 		stepFiveInstructions [0] = "Great job! Now go to the checkout till and take items from your inventory and place them on the checkout till.";
 		dialogues.Add (TutorialState.stepFive, stepFiveInstructions);
