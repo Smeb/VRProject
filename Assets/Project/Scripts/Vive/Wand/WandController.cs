@@ -15,7 +15,6 @@ public partial class WandController : Owner
 
     private SteamVR_Controller.Device controller {  get { return SteamVR_Controller.Input((int)trackedObject.index); } }
     private SteamVR_TrackedObject trackedObject;
-    public GameObject anchor;
 
     // Controller button press timing
     private Timer timer;
