@@ -209,7 +209,7 @@ public partial class WandController : Owner
             }
         }
 
-        if (controller.GetTouchDown(touchpadButton))
+        if (controller.GetPressDown(SteamVR_Controller.ButtonMask.Touchpad))
         {
             if (OnTouchpadPress != null)
             {
@@ -225,7 +225,7 @@ public partial class WandController : Owner
 
     public Vector2 GetTouchpadAxis()
     {
-        return controller.GetAxis(touchpadButton);
+        return controller.GetAxis();
     }
 
     public override void GiveUpObject(Property item)

@@ -28,8 +28,8 @@ public class PlayerController : MonoBehaviour
     public string locomotion = "walk-in-place";
     Vector3 lastPosition;
     float velocity;
-    float turnVelocity;
 
+    // Motion controls
     [SerializeField] float headPosition = 1.65f;
     float headOffset = 0.1f;
 
@@ -131,7 +131,7 @@ public class PlayerController : MonoBehaviour
         {
             float yChange = camera.head.localPosition.y - lastPosition.y;
             float desiredVelocity = Time.deltaTime > 0 ? (Mathf.Abs(yChange)) * 5 / Time.deltaTime : 0;
-            velocity = Mathf.Lerp(velocity, desiredVelocity, Time.deltaTime * 5);
+            velocity = Mathf.Lerp(velocity, desiredVelocity, Time.deltaTime * 5) * activeState.forceScale;
             Vector3 moveDirection = activeTouchpadController.transform.rotation * Vector3.forward;
             moveDirection = new Vector3(moveDirection.x, 0, moveDirection.z).normalized;
             Vector3 move = moveDirection * velocity * Time.deltaTime;
