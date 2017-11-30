@@ -10,8 +10,9 @@ public class ContainerController : Owner {
     private float maxInnerRadius;
     private float originalScale;
 
-    private void Start()
+    public override void Start()
     {
+        base.Start();
         fixedJoint = gameObject.GetComponent<FixedJoint>();
         maxInnerRadius = GetComponent<Renderer>().bounds.size.x * 0.8f;
         originalColor = gameObject.GetComponent<Renderer>().material.color;
@@ -33,7 +34,7 @@ public class ContainerController : Owner {
     protected override void TakeOwnership(Property item)
     { 
         base.TakeOwnership(item);
-        item.transform.localScale *= FindItemScale(ownedItem);
+        anchor.transform.localScale *= FindItemScale(ownedItem);
         item.transform.rotation = transform.rotation;
         Vector3 offset = item.GetComponent<Renderer>().bounds.center - item.transform.position;
         item.transform.position = transform.position - offset;

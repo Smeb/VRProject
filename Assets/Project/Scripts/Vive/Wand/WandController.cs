@@ -108,11 +108,16 @@ public partial class WandController : Owner
 
         if (OwnsItem() && closestContainer && !closestContainer.OwnsItem())
         {
-            ScaleItemDown();
+            if (!itemScaledDown)
+            {
+                itemScaledDown = true;
+                ScaleItemDown();
+            }        
         }
-        else if (OwnsItem())
+        else if (OwnsItem() && itemScaledDown)
         {
-            ownedItem.transform.localScale = new Vector3(1, 1, 1);
+            itemScaledDown = false;
+            anchor.transform.localScale = new Vector3(1, 1, 1);
         }
 
         // Viewpoint controls

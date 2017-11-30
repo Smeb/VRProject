@@ -4,7 +4,10 @@ using UnityEngine;
 
 public abstract class Owner : MonoBehaviour
 {
-    private Property m_ownedItem;
+    [SerializeField] private Property m_ownedItem;
+    protected GameObject anchor;
+    protected Transform itemPreviousParent;
+
     protected virtual Property ownedItem
     {
         get
@@ -13,14 +16,36 @@ public abstract class Owner : MonoBehaviour
         }
         set
         {
-            if (value != null)
+            if (m_ownedItem != value)
             {
-                value.owner = this;
+                if (m_ownedItem)
+                {
+                    m_ownedItem.transform.parent = itemPreviousParent;
+                }
+
+                if (value != null)
+                {
+                    itemPreviousParent = value.transform.parent;
+                    value.owner = this;
+                    value.transform.parent = anchor.transform;
+                }
+                else
+                {
+                    itemPreviousParent = null;
+                }
+
+                m_ownedItem = value;
             }
-            m_ownedItem = value;
         }
     }
 
+    public virtual void Start()
+    {
+        anchor = new GameObject("Anchor");
+        anchor.transform.parent = this.transform;
+        anchor.transform.localPosition = GetComponent<SphereCollider>().center;
+    }
+    
     protected virtual void TakeOwnership(Property item)
     {
         ownedItem = item;

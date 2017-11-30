@@ -8,6 +8,7 @@ public partial class WandController : Owner
     private HashSet<GameObject> hoveredInteractables = new HashSet<GameObject>();
     private HashSet<GameObject> hoveredContainers = new HashSet<GameObject>();
     private ContainerController closestContainer;
+    private bool itemScaledDown;
 
     [SerializeField]
     private GameObject m_closestItem;
@@ -39,17 +40,10 @@ public partial class WandController : Owner
 
     void ScaleItemDown()
     {
-        Renderer renderer = ownedItem.GetComponent<Renderer>();
+        fixedJoint.connectedBody = null;
         float scale = closestContainer.FindItemScale(ownedItem);
-        Vector3 sphereCenter = transform.TransformPoint(GetComponent<SphereCollider>().center);
-        Vector3 closestPoint = renderer.bounds.ClosestPoint(sphereCenter);
-
-        Debug.Log(sphereCenter);
-        Vector3 distance = closestPoint - sphereCenter;
-        Vector3 offset = distance - (distance * scale);
-        Debug.Log(offset);
-        
-        ownedItem.transform.position += offset;        
+        anchor.transform.localScale = new Vector3(scale, scale, scale);
+        fixedJoint.connectedBody = ownedItem.GetComponent<Rigidbody>();
     }
 
     void SetClosestItem()
@@ -131,7 +125,7 @@ public partial class WandController : Owner
         }
 
         ownedItem = item;
-        fixedJoint.connectedBody = closestItem.GetComponent<Rigidbody>();
+        fixedJoint.connectedBody = ownedItem.GetComponent<Rigidbody>();
 
         closestItem = null;
     }
