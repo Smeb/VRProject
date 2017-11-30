@@ -6,7 +6,7 @@ public class ContainerController : Owner {
     public float highlightAlpha = 0.35f;
     private Color originalColor;
     private Color highlightColor;
-    private FixedJoint fixedJoint;
+    protected FixedJoint fixedJoint;
     private float maxInnerRadius;
     private float originalScale;
 
@@ -44,8 +44,6 @@ public class ContainerController : Owner {
     public override void GiveUpObject(Property item)
     {
         fixedJoint.connectedBody = null;
-
-        item.transform.localScale = new Vector3(1, 1, 1);
         base.GiveUpObject(item);
     }
 }

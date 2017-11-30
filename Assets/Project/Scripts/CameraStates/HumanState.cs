@@ -36,9 +36,5 @@ public class HumanState : CameraState
         : base(referenceObject, referenceFloor, scale, forceScale)
     {
         this.cameraRig = cameraRig;
-        if (referenceObject.GetComponent<PlayerPositionValidator>())
-        {
-            throw new UnityException("Missing expected component script on referenceObject");
-        }
     }
 }

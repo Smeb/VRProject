@@ -39,9 +39,17 @@ public partial class WandController : Owner
 
     void ScaleItemDown()
     {
-        Renderer objectRenderer = ownedItem.GetComponent<Renderer>();
+        Renderer renderer = ownedItem.GetComponent<Renderer>();
         float scale = closestContainer.FindItemScale(ownedItem);
-        ownedItem.transform.localScale *= scale;
+        Vector3 sphereCenter = transform.TransformPoint(GetComponent<SphereCollider>().center);
+        Vector3 closestPoint = renderer.bounds.ClosestPoint(sphereCenter);
+
+        Debug.Log(sphereCenter);
+        Vector3 distance = closestPoint - sphereCenter;
+        Vector3 offset = distance - (distance * scale);
+        Debug.Log(offset);
+        
+        ownedItem.transform.position += offset;        
     }
 
     void SetClosestItem()

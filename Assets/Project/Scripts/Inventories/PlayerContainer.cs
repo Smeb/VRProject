@@ -20,6 +20,7 @@ public class PlayerContainer : ContainerController {
         if (ownedItem)
         {
             ownedItem.GetComponent<Renderer>().enabled = toggle;
+            ownedItem.GetComponent<Collider>().enabled = toggle;
         }
     }
 

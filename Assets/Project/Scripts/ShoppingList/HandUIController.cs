@@ -24,6 +24,7 @@ public class HandUIController : MonoBehaviour {
         scanModeText = scanMode.GetComponentInChildren<Text>();
         playerController = GetComponentInParent<PlayerController>();
         containers = GetComponentsInChildren<PlayerContainer>();
+        UpdatePlayerContainerVisibilities();
     }
 
     private void OnChangeState(CameraState state)
@@ -89,6 +90,19 @@ public class HandUIController : MonoBehaviour {
         shoppingListPanel.ClearAll();
     }
 
+    void UpdatePlayerContainerVisibilities()
+    {
+        if (playerController.activeState is HumanState)
+        {
+            foreach (PlayerContainer container in containers)
+            {
+                container.ToggleVisibility(isVisible);
+            }
+        }
+            
+    }
+
+
     void ToggleVisibility()
     {
         if (isVisible != previousActiveState)
@@ -107,14 +121,7 @@ public class HandUIController : MonoBehaviour {
                 c.enabled = isVisible;
             }
 
-            if (playerController.activeState is HumanState)
-            {
-                foreach (PlayerContainer container in containers)
-                {
-
-                    container.ToggleVisibility(isVisible);
-                }
-            }
+            UpdatePlayerContainerVisibilities();
             
             shoppingListPanel.gameObject.SetActive(isVisible);
             previousActiveState = isVisible;

@@ -7,7 +7,7 @@ public class ShoppingListItemCollection : MonoBehaviour {
 	public Transform itemsParent;
 
 
-	[SerializeField] private ShoppingListItem[] slots;
+	[SerializeField] public ShoppingListItem[] slots;
     private int freeSlotIndex = 0;
 	public IconMap iconMap;
 	public GameObject BGPanel;
