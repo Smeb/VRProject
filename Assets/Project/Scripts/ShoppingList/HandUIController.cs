@@ -5,15 +5,15 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-public class ShoppingListController : MonoBehaviour {
+public class HandUIController : MonoBehaviour {
     private PlayerController playerController;
-    private SteamVR_Camera camera;
     private ShoppingListItemCollection shoppingListPanel;
     private bool scannerToggledOn;
     [SerializeField] private Button scanMode;
     private Text scanModeText;
     private bool isVisible;
     private bool previousActiveState = true;
+    private PlayerContainer[] containers;
 
     public event Action ShoppingListOpen, ShoppingListClose, ScanModeOn, ScanModeOff;
 
@@ -23,6 +23,25 @@ public class ShoppingListController : MonoBehaviour {
         scanMode = GameObject.Find("ScanButton").GetComponent<Button>();
         scanModeText = scanMode.GetComponentInChildren<Text>();
         playerController = GetComponentInParent<PlayerController>();
+        containers = GetComponentsInChildren<PlayerContainer>();
+    }
+
+    private void OnChangeState(CameraState state)
+    {
+        if (state is GodState)
+        {
+            foreach(PlayerContainer container in containers)
+            {
+                container.ToggleVisibility(false);
+            }
+        }
+        if (state is HumanState && isVisible)
+        {
+            foreach (PlayerContainer container in containers)
+            {
+                container.ToggleVisibility(true);
+            }
+        }
     }
 
     public void AddItem(int code)
@@ -55,12 +74,14 @@ public class ShoppingListController : MonoBehaviour {
     {
         SceneManager.sceneLoaded += OnSceneLoad;
         playerController.AddItem += AddItem;
+        playerController.OnChangeState += OnChangeState;
     }
 
     private void OnDisable()
     {
         SceneManager.sceneLoaded -= OnSceneLoad;
         playerController.AddItem -= AddItem;
+        playerController.OnChangeState -= OnChangeState;
     }
 
     void OnSceneLoad(Scene scene, LoadSceneMode mode)
@@ -84,6 +105,15 @@ public class ShoppingListController : MonoBehaviour {
             foreach (Collider c in GetComponents<Collider>())
             {
                 c.enabled = isVisible;
+            }
+
+            if (playerController.activeState is HumanState)
+            {
+                foreach (PlayerContainer container in containers)
+                {
+
+                    container.ToggleVisibility(isVisible);
+                }
             }
             
             shoppingListPanel.gameObject.SetActive(isVisible);

@@ -147,13 +147,13 @@ public class PlayerController : MonoBehaviour
         controller.OnTouchpadRelease += TouchpadReleaseHandler;
         controller.OnTouchpadUpdate += TouchpadUpdateHandler;
 
-        ShoppingListController shoppingListController = controller.GetComponentInChildren<ShoppingListController>();
-        if (shoppingListController)
+        HandUIController handUIController = controller.GetComponentInChildren<HandUIController>();
+        if (handUIController)
         {
-            shoppingListController.ShoppingListOpen += OnShoppingListOpen;
-            shoppingListController.ShoppingListClose += OnShoppingListClose;
-            shoppingListController.ScanModeOn += OnScanModeOn;
-            shoppingListController.ScanModeOff += OnScanModeOff;
+            handUIController.ShoppingListOpen += OnShoppingListOpen;
+            handUIController.ShoppingListClose += OnShoppingListClose;
+            handUIController.ScanModeOn += OnScanModeOn;
+            handUIController.ScanModeOff += OnScanModeOff;
         }
     }
 
@@ -163,13 +163,13 @@ public class PlayerController : MonoBehaviour
         controller.OnTouchpadRelease -= TouchpadReleaseHandler;
         controller.OnTouchpadUpdate -= TouchpadUpdateHandler;
 
-        ShoppingListController shoppingListController = controller.GetComponentInChildren<ShoppingListController>();
-        if (shoppingListController)
+        HandUIController handUIController = controller.GetComponentInChildren<HandUIController>();
+        if (handUIController)
         {
-            shoppingListController.ShoppingListOpen -= OnShoppingListOpen;
-            shoppingListController.ShoppingListClose -= OnShoppingListClose;
-            shoppingListController.ScanModeOn -= OnScanModeOn;
-            shoppingListController.ScanModeOff -= OnScanModeOff;
+            handUIController.ShoppingListOpen -= OnShoppingListOpen;
+            handUIController.ShoppingListClose -= OnShoppingListClose;
+            handUIController.ScanModeOn -= OnScanModeOn;
+            handUIController.ScanModeOff -= OnScanModeOff;
         }
     }
 

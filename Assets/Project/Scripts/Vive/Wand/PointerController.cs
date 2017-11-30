@@ -12,7 +12,7 @@ public partial class WandController : Owner
     // Pointer specific scripts
     private LaserPointer pointer;
     private EventSystem eventSystem;
-    private ShoppingListController shoppingListController;
+    private HandUIController handUIController;
     [SerializeField] private bool shoppingListOpen = false;
     private bool scanModeOn = false;
 

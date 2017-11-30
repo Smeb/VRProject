@@ -7,9 +7,8 @@ public class ContainerController : Owner {
     private Color originalColor;
     private Color highlightColor;
     private FixedJoint fixedJoint;
-    private Renderer renderer;
     private float maxInnerRadius;
-    private float scale;
+    private float originalScale;
 
     private void Start()
     {
@@ -34,9 +33,7 @@ public class ContainerController : Owner {
     protected override void TakeOwnership(Property item)
     { 
         base.TakeOwnership(item);
-        scale = FindItemScale(ownedItem);
-
-        item.transform.localScale *= scale;
+        item.transform.localScale *= FindItemScale(ownedItem);
         item.transform.rotation = transform.rotation;
         Vector3 offset = item.GetComponent<Renderer>().bounds.center - item.transform.position;
         item.transform.position = transform.position - offset;
@@ -48,7 +45,7 @@ public class ContainerController : Owner {
     {
         fixedJoint.connectedBody = null;
 
-        item.transform.localScale /= scale;
+        item.transform.localScale = new Vector3(1, 1, 1);
         base.GiveUpObject(item);
     }
 }
