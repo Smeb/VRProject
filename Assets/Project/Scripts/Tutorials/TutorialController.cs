@@ -67,7 +67,7 @@ public class TutorialController : MonoBehaviour {
 
 		dialogues = new Dictionary<TutorialState, string[]> ();
 		populateDialogues ();
-		UpdateText (); 
+		UpdateText ();
 	
 
 	}
@@ -93,6 +93,8 @@ public class TutorialController : MonoBehaviour {
 
 		case TutorialState.stepTwo:
 
+			int runOnSpot = Animator.StringToHash ("RunOnSpot");
+			animator.SetBool (runOnSpot, true); 
 			MoveHostToTarget (target1);
 
 			/*
