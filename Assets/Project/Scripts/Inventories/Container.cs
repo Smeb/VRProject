@@ -34,8 +34,7 @@ public class ContainerController : Owner {
     protected override void TakeOwnership(Property item)
     { 
         base.TakeOwnership(item);
-        float scale = FindItemScale(ownedItem);
-        anchor.transform.localScale = new Vector3(scale, scale, scale);
+        anchor.transform.localScale *= FindItemScale(ownedItem);
         item.transform.rotation = transform.rotation;
         Vector3 offset = item.GetComponent<Renderer>().bounds.center - item.transform.position;
         item.transform.position = transform.position - offset;
