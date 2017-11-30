@@ -8,20 +8,25 @@ public class PlayerContainer : ContainerController {
     public void ToggleVisibility(bool toggle)
     {
         GetComponent<Collider>().enabled = toggle;
-        foreach(WandController controller in triggeringObjects)
-        {
-            if (toggle == false)
-            {
-                controller.CommonInventoryExitedTrigger(this.gameObject);
-            }
-        }
 
+        GameObject containedObject = null;
         GetComponent<Renderer>().enabled = toggle;
+
         if (ownedItem)
         {
+            containedObject = ownedItem.gameObject;
             ownedItem.GetComponent<Renderer>().enabled = toggle;
             ownedItem.GetComponent<Collider>().enabled = toggle;
         }
+
+        foreach (WandController controller in triggeringObjects)
+        {
+            if (toggle == false)
+            {
+                controller.ContainerDisabled(this.gameObject, containedObject);
+            }
+        }
+
     }
 
     public void OnTriggerEnter(Collider other)

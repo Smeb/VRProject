@@ -123,6 +123,7 @@ public partial class WandController : Owner
         // Viewpoint controls
         if (controller.GetPressDown(toggleViewpoint))
         {
+            UCL.COMPGV07.Logging.KeyDown();
             timer.StartTimer(toggleViewpoint);
         }
 
@@ -149,6 +150,8 @@ public partial class WandController : Owner
 
         if (controller.GetPressDown(triggerButton))
         {
+            UCL.COMPGV07.Logging.KeyDown();
+
             if (shoppingListOpen && scanModeOn && button == null)
             {
                 if (currentProduct != null)
@@ -179,6 +182,8 @@ public partial class WandController : Owner
 
         if (controller.GetPressDown(SteamVR_Controller.ButtonMask.Touchpad))
         {
+            UCL.COMPGV07.Logging.KeyDown();
+
             if (OnTouchpadPress != null)
             {
                 OnTouchpadPress(this);
@@ -226,7 +231,7 @@ public partial class WandController : Owner
         }
         else if (other.gameObject.layer == LayerMask.NameToLayer("Inventory"))
         {
-            CommonInventoryExitedTrigger(other.gameObject);
+            hoveredContainers.Remove(other.gameObject);
         }
     }
 }

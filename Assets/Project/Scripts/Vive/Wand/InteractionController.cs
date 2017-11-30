@@ -65,6 +65,7 @@ public partial class WandController : Owner
 
                 }
             }
+
             closestItem = newClosestItem;
         }
         else
@@ -75,14 +76,14 @@ public partial class WandController : Owner
 
     void SetClosestContainer()
     {
-        if (hoveredContainers.Count != 0)
+        if (OwnsItem() && hoveredContainers.Count != 0)
         {
             float minDistance = float.MaxValue;
             float distance;
 
             foreach (GameObject gameObject in hoveredContainers)
             {
-                distance = (gameObject.transform.position - transform.position).sqrMagnitude;
+                distance = (gameObject.transform.position - ownedItem.GetComponent<Renderer>().bounds.center).sqrMagnitude;
                 if (distance < minDistance)
                 {
                     minDistance = distance;
@@ -96,9 +97,10 @@ public partial class WandController : Owner
         }
     }
 
-    public void CommonInventoryExitedTrigger(GameObject gameObject)
+    public void ContainerDisabled(GameObject container, GameObject item)
     {
-        hoveredContainers.Remove(gameObject);
+        hoveredInteractables.Remove(item);
+        hoveredContainers.Remove(container);
     }
 
     public override void GiveUpObject(Property item)

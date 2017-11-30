@@ -25,8 +25,8 @@ public abstract class Owner : MonoBehaviour
 
                 if (value != null)
                 {
-                    itemPreviousParent = value.transform.parent;
                     value.owner = this;
+                    itemPreviousParent = value.transform.parent;
                     value.transform.parent = anchor.transform;
                 }
                 else
