@@ -18,6 +18,8 @@ public class HandUIController : MonoBehaviour {
     private bool scannerOnline;
     private bool previousActiveState = true;
     private PlayerContainer[] containers;
+    public HashSet<GameObject> containedItems = new HashSet<GameObject>();
+    public HashSet<int> addedItems = new HashSet<int>();
 
     public event ToggleEvent ToggleShoppingList;
     public event ToggleEvent ToggleScanMode;
@@ -32,6 +34,21 @@ public class HandUIController : MonoBehaviour {
         UpdatePlayerContainerVisibilities();
         scanner = transform.Find("Scanner").gameObject;
         scanStatusMessage = scanner.transform.Find("ScanStatusMessage").gameObject;
+        foreach (PlayerContainer container in containers)
+        {
+            container.AddItem += OnContainerAddItem;
+            container.RemoveItem += OnContainerRemoveItem;
+        }
+    }
+
+    void OnContainerAddItem(GameObject gameObject)
+    {
+        containedItems.Add(gameObject);
+    }
+
+    void OnContainerRemoveItem(GameObject gameObject)
+    {
+        containedItems.Remove(gameObject);
     }
 
     private void OnChangeState(CameraState state)
@@ -69,6 +86,7 @@ public class HandUIController : MonoBehaviour {
 
     public void AddItem(GameObject item)
     {
+        addedItems.Add(item.GetComponent<ProductCode>().Code);
         ToggleCameraScanner(true);
         shoppingListPanel.AddItem(item);
     }
