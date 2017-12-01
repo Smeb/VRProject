@@ -161,6 +161,11 @@ public partial class WandController : Owner
             }
             else if (button != null)
             {
+                ButtonScript script = button.GetComponent<ButtonScript>();
+                if (script)
+                {
+                    script.onClick();
+                }
                 button.onClick.Invoke();
             }
             else if (!scanModeOn && closestItem)

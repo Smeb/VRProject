@@ -27,7 +27,12 @@ public class ShoppingListItemCollection : MonoBehaviour {
     
     public void Initialise()
     {
-        experiment = GameObject.Find("Checkout").GetComponent<UCL.COMPGV07.Experiment>();
+        GameObject experimentObject = GameObject.Find("Checkout");
+        if (experimentObject)
+        {
+            experiment = experimentObject.GetComponent<UCL.COMPGV07.Experiment>();
+        }
+        
         this.ClearAll();
         if (experiment)
         {

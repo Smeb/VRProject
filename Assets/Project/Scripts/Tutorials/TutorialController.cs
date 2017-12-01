@@ -8,6 +8,7 @@ public class TutorialController : MonoBehaviour
 
 
     //Canvas elements 
+    public GameObject pane;
     public GameObject canvasUI;
     public Text canvasText;
     public Button nextButton;
@@ -24,7 +25,6 @@ public class TutorialController : MonoBehaviour
     public Animator animator;
 
     // Position References 
-    public GameObject target1; //After Step 1
     public PlayerContainer[] containers;
     HashSet<int> itemsToGet;
 
@@ -49,6 +49,10 @@ public class TutorialController : MonoBehaviour
         stepSix
     }
 
+
+    public GameObject markerOne, markerTwo, markerThree;
+
+
     public TutorialState tutorialState;
 
     bool HasItemsInInventory()
@@ -68,11 +72,17 @@ public class TutorialController : MonoBehaviour
         return true;
     }
 
+    int runOnSpot;
+
     public Dictionary<TutorialState, string[]> dialogues;
 
     // Use this for initialization
     void Start()
     {
+        markerOne = GameObject.Find("MarkerOne");
+        markerTwo = GameObject.Find("MarkerTwo");
+        markerThree = GameObject.Find("MarkerThree");
+
         itemsToGet = new HashSet<int>();
         itemsToGet.Add(49);
         itemsToGet.Add(51);
@@ -101,6 +111,8 @@ public class TutorialController : MonoBehaviour
         nextButton.interactable = true;
 
         animator = host.GetComponent<Animator>();
+        runOnSpot = Animator.StringToHash("Run");
+        
 
         dialogues = new Dictionary<TutorialState, string[]>();
         populateDialogues();
@@ -121,6 +133,8 @@ public class TutorialController : MonoBehaviour
         {
 
             case TutorialState.stepOne:
+                canvasUI.transform.position = markerOne.transform.position;
+                canvasUI.transform.rotation = markerOne.transform.rotation;
                 if (Vector3.Distance(this.transform.position, host.transform.position) < 3)
                 {
                     UpdateState();
@@ -131,13 +145,11 @@ public class TutorialController : MonoBehaviour
                 break;
 
             case TutorialState.stepTwo:
+                canvasUI.transform.position = markerTwo.transform.position;
+                canvasUI.transform.rotation = markerTwo.transform.rotation;
                 if (playerController.activeState is GodState)
                 {
                     hasBeenGod = true;
-                    // scale up host
-                    int runOnSpot = Animator.StringToHash("RunOnSpot");
-                    animator.SetBool(runOnSpot, true);
-                    MoveHostToTarget(target1);
                 }
                 if (hasBeenGod && Vector3.Distance(this.transform.position, host.transform.position) < 3)
                 {
@@ -164,6 +176,8 @@ public class TutorialController : MonoBehaviour
                 break;
 
             case TutorialState.stepFive:
+                canvasUI.transform.position = markerThree.transform.position;
+                canvasUI.transform.rotation = markerThree.transform.rotation;
                 if (handController.containedItems.Count == 0)
                 {
                     UpdateState();
@@ -285,9 +299,33 @@ public class TutorialController : MonoBehaviour
         dialogues.Add(TutorialState.stepSix, stepSixInstructions);
     }
 
+
     void MoveHostToTarget(GameObject target)
     {
         float step = 2.0f * Time.deltaTime;
-        host.transform.position = Vector3.MoveTowards(host.transform.position, target.transform.position, step);
+
+        // if you are close enough, look at the host!
+        if (Vector3.Distance(target.transform.position, host.transform.position) <= 0.09)
+        {
+            animator.SetBool(runOnSpot, false);
+            host.transform.LookAt(this.transform);
+
+        }
+        else
+        {
+            RotateTo(target, step);
+            host.transform.position = Vector3.MoveTowards(host.transform.position, target.transform.position, step);
+        }
+
+
+    }
+
+
+    void RotateTo(GameObject target, float step)
+    {
+        Vector3 targetDir = target.transform.position - host.transform.position;
+        Vector3 newDir = Vector3.RotateTowards(host.transform.forward, targetDir, step, 0.0F);
+        //Debug.DrawRay (host.transform.position, newDir, Color.red);
+        host.transform.rotation = Quaternion.LookRotation(newDir);
     }
 }
