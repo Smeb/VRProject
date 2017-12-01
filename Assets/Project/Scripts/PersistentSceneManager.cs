@@ -10,7 +10,8 @@ public class PersistentSceneManager : MonoBehaviour {
     public Material statueHighlight;
     public Material supermarketNormal;
     public Material supermarketHighlight;
-    
+    public Material alternateNormal;
+    public Material alternateHighlight;
 
     void Start () {
         LoadLevel(startScene);
@@ -18,7 +19,9 @@ public class PersistentSceneManager : MonoBehaviour {
         TextureController.statueHighlight = statueHighlight;
         TextureController.supermarketNormal = supermarketNormal;
         TextureController.supermarketHighlight = supermarketHighlight;
-	}
+        TextureController.alternateNormal = alternateNormal;
+        TextureController.alternateHighlight = alternateHighlight;
+    }
 
     public void LoadLevel (string name)
     {

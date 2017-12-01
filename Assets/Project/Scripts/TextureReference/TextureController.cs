@@ -6,6 +6,8 @@ public static class TextureController
 {
     public static Material supermarketNormal;
     public static Material supermarketHighlight;
+    public static Material alternateNormal;
+    public static Material alternateHighlight;
     public static Material statueNormal;
     public static Material statueHighlight;
 }

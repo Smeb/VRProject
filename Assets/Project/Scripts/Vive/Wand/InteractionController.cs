@@ -154,7 +154,15 @@ public partial class WandController : Owner
 
             if (gameObject.GetComponent<ProductCode>())
             {
-                renderer.material = TextureController.supermarketHighlight;
+                int code = gameObject.GetComponent<ProductCode>().Code;
+                if (code >= 49 && code <= 56)
+                {
+                    renderer.material = TextureController.alternateHighlight;
+                }
+                else
+                {
+                    renderer.material = TextureController.supermarketHighlight;
+                }
             }
             else
             {
