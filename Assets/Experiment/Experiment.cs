@@ -101,7 +101,7 @@ namespace UCL.COMPGV07{
 
             if(itemsOutstanding.Count == 0)
             {
-                UCL.COMPGV07.Logging.EndLogging();
+                Application.Quit();
             }
 
             return true;

@@ -149,6 +149,7 @@ namespace UCL.COMPGV07
 
         void OnApplicationQuit()
         {
+            Debug.Log("Application quit");
             trial.itemsToCollect = GetComponent<Experiment>().ItemsToCollect;
             trial.itemsCollected = GetComponent<Experiment>().ItemsCollected;
             BinaryFormatter formatter = new BinaryFormatter();
