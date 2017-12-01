@@ -128,6 +128,10 @@ public class PlayerController : MonoBehaviour
         {   
             levelOffset = 9.62f;
         }
+        if (scene.name == "Tutorial")
+        {
+            levelOffset = 2f;
+        }
         godReferencePosition.transform.position = new Vector3(godReferencePosition.transform.position.x, humanReferenceFloor.transform.position.y - godPositionRenderer.bounds.center.y - halfTableHeight - 0.1f - levelOffset, godReferencePosition.transform.position.z);
         godReferenceFloor.transform.position = new Vector3(godReferenceFloor.transform.position.x, godPositionRenderer.bounds.center.y - halfTableHeight, godReferenceFloor.transform.position.z);
     }
@@ -152,7 +156,6 @@ public class PlayerController : MonoBehaviour
             Vector3 moveDirection = activeTouchpadController.transform.rotation * Vector3.forward;
             moveDirection = new Vector3(moveDirection.x, 0, moveDirection.z).normalized;
             Vector3 move = moveDirection * velocity * Time.deltaTime;
-            Debug.Log(move);
             cameraRig.transform.position += move;
         }
 

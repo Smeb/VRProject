@@ -6,12 +6,16 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class HandUIController : MonoBehaviour {
+    private GameObject scanStatusMessage;
     private PlayerController playerController;
     private ShoppingListItemCollection shoppingListPanel;
     private bool scannerToggledOn;
     [SerializeField] private Button scanMode;
+
+    private GameObject scanner;
     private Text scanModeText;
     private bool isVisible;
+    private bool scannerOnline;
     private bool previousActiveState = true;
     private PlayerContainer[] containers;
 
@@ -26,6 +30,8 @@ public class HandUIController : MonoBehaviour {
         playerController = GetComponentInParent<PlayerController>();
         containers = GetComponentsInChildren<PlayerContainer>();
         UpdatePlayerContainerVisibilities();
+        scanner = transform.Find("Scanner").gameObject;
+        scanStatusMessage = scanner.transform.Find("ScanStatusMessage").gameObject;
     }
 
     private void OnChangeState(CameraState state)
@@ -46,8 +52,24 @@ public class HandUIController : MonoBehaviour {
         }
     }
 
+    private void ToggleCameraScanner(bool state)
+    {
+        scannerOnline = state;
+        if (scannerOnline)
+        {
+            scanStatusMessage.transform.Find("Title").GetComponent<Text>().text = "Scanner Online";
+            scanStatusMessage.transform.Find("Body").GetComponent<Text>().text = "";
+        }
+        else
+        {
+            scanStatusMessage.transform.Find("Title").GetComponent<Text>().text = "Scanner Offline";
+            scanStatusMessage.transform.Find("Body").GetComponent<Text>().text = "Add items to enable scanner";
+        }
+    }
+
     public void AddItem(GameObject item)
     {
+        ToggleCameraScanner(true);
         shoppingListPanel.AddItem(item);
     }
 
@@ -59,7 +81,7 @@ public class HandUIController : MonoBehaviour {
             {
                 ToggleScanMode(false);
             }
-            scanModeText.text = "Enable Scan Mode";
+            scanModeText.text = "Enable Add Item Mode";
         }
         else
         {
@@ -67,7 +89,7 @@ public class HandUIController : MonoBehaviour {
             {
                 ToggleScanMode(true);
             }
-            scanModeText.text = "Disable Scan Mode";
+            scanModeText.text = "Disable Add Item Mode";
         }
         scannerToggledOn = !scannerToggledOn;
     }
@@ -79,6 +101,7 @@ public class HandUIController : MonoBehaviour {
         playerController.OnChangeState += OnChangeState;
         shoppingListPanel.gameObject.SetActive(true);
         shoppingListPanel.Initialise();
+        scanStatusMessage.SetActive(true);
     }
 
     private void OnDisable()
@@ -90,6 +113,7 @@ public class HandUIController : MonoBehaviour {
 
     void OnSceneLoad(Scene scene, LoadSceneMode mode)
     {
+        ToggleCameraScanner(false);
         shoppingListPanel.gameObject.SetActive(true);
         shoppingListPanel.Initialise();
     }
@@ -120,7 +144,8 @@ public class HandUIController : MonoBehaviour {
             }
 
             UpdatePlayerContainerVisibilities();
-            
+
+            scanner.SetActive(isVisible);
             shoppingListPanel.gameObject.SetActive(isVisible);
             previousActiveState = isVisible;
         }

@@ -12,6 +12,7 @@ public class ShoppingListItemCollection : MonoBehaviour {
     private int freeSlotIndex = 0;
 	public IconMap iconMap;
 	public GameObject BGPanel;
+    public Material markerMaterial;
 	public bool active;
 
     public UCL.COMPGV07.Experiment experiment;
@@ -22,8 +23,6 @@ public class ShoppingListItemCollection : MonoBehaviour {
     {
         slots = this.GetComponentsInChildren<ShoppingListItem>();
         iconMap = new IconMap();
-
-
     }
     
     public void Initialise()
@@ -62,7 +61,12 @@ public class ShoppingListItemCollection : MonoBehaviour {
         {
             if (spawnedItem.GetComponent<ProductCode>().Code == code)
             {
-                spawnedItem.GetComponent<Renderer>().material = TextureController.supermarketHighlight;
+                GameObject marker = Instantiate(spawnedItem);
+                Destroy(marker.GetComponent<Collider>());
+                Destroy(marker.GetComponent<Rigidbody>());
+                marker.transform.position = spawnedItem.transform.position;
+                marker.transform.parent = spawnedItem.transform;
+                marker.GetComponent<Renderer>().material = markerMaterial;
             }
         }
 
