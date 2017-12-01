@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
+using UnityEngine.SceneManagement;
 
 public class ShoppingListItemCollection : MonoBehaviour {
 	public Transform itemsParent;
@@ -13,17 +14,23 @@ public class ShoppingListItemCollection : MonoBehaviour {
 	public GameObject BGPanel;
 	public bool active;
 
-	public GameObject parentGO; 
+    public UCL.COMPGV07.Experiment experiment;
 
-	public ItemChecker itemChecker; 
+	public ItemChecker itemChecker;
 
-	void Start () {
-		slots = this.GetComponentsInChildren<ShoppingListItem> ();
-		iconMap = new IconMap(); 
-        
-		int[] itemsToCheck = { 55, 55, 55 };
-		itemChecker = new ItemChecker(itemsToCheck);
-	}
+    void Awake()
+    {
+        slots = this.GetComponentsInChildren<ShoppingListItem>();
+        iconMap = new IconMap();
+
+        itemChecker = new ItemChecker(experiment.ItemsToCollect);
+    }
+
+    public void OnSceneLoad()
+    {
+        experiment = GameObject.Find("Checkout").GetComponent<UCL.COMPGV07.Experiment>();
+        this.ClearAll();
+    }
 
     public void ClearAll()
     {
@@ -43,22 +50,18 @@ public class ShoppingListItemCollection : MonoBehaviour {
         }
     }
 
-	void Update () {
-        if(Input.GetKeyDown(KeyCode.Space))
-        {
-            AddItem(55);
-        }
-        if (Input.GetKeyDown(KeyCode.A))
-        {
-            ClearAll();
-        }
-        if (Input.GetKeyDown(KeyCode.B))
-        {
-            ClearLast();
-        }
-    }
+	public void AddItem(GameObject item){
+        experiment.spawnedItems.Remove(item);
+        int code = item.GetComponent<ProductCode>().Code;
 
-	public void AddItem(int code){
+        foreach (GameObject spawnedItem in experiment.spawnedItems)
+        {
+            if (spawnedItem.GetComponent<ProductCode>().Code == code)
+            {
+                spawnedItem.GetComponent<Renderer>().material = TextureController.supermarketHighlight;
+            }
+        }
+
         if (freeSlotIndex < slots.Length)
         {
             Sprite spriteIcon = iconMap.GetIconPath(code);
@@ -147,7 +150,6 @@ public class IconMap : MonoBehaviour  {
 		// Load a PNG or JPG file from disk to a Texture2D
 		// Returns null if load fails
 
-		print (FilePath); 
 		Texture2D Tex2D;
 		byte[] FileData;
 

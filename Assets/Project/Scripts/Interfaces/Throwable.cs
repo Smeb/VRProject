@@ -10,6 +10,7 @@ public class Throwable : Property {
     {
         this.scale = forceScale;
         throwing = true;
+        this.owner = null;
     }
 
     private void FixedUpdate()

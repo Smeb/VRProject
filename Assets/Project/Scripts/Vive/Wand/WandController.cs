@@ -156,7 +156,7 @@ public partial class WandController : Owner
             {
                 if (currentProduct != null)
                 {
-                    playerController.OnAddItem(currentProduct.Code);
+                    playerController.OnAddItem(currentProduct);
                 }
             }
             else if (button != null)

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public delegate void AddItemDelegate(int code);
+public delegate void AddItemDelegate(GameObject item);
 
 public class PlayerController : MonoBehaviour
 {
@@ -12,12 +12,18 @@ public class PlayerController : MonoBehaviour
     public event Action ShoppingListOpen, ShoppingListClose;
     public event Action ScanModeOn, ScanModeOff;
     public event AddItemDelegate AddItem;
-    public void OnAddItem(int code)
+
+    public void OnAddItem(GameObject item)
     {
         if (AddItem != null)
         {
-            AddItem(code);
+            AddItem(item);
         }
+    }
+
+    public void OnDestroy()
+    {
+        Debug.Log("Destroy attempted");
     }
 
     public GameObject playerBody;
@@ -79,7 +85,7 @@ public class PlayerController : MonoBehaviour
         godReferencePosition = GameObject.Find("GodPosition");
         godReferenceFloor = GameObject.Find("GodFloor");
 
-        SetGodFloorAndPosition();
+        SetGodFloorAndPosition(scene);
 
         if (humanReferenceFloor == null) Debug.LogError("Human floor reference missing");
         if (humanReferencePosition == null) Debug.LogError("Human position reference missing");
@@ -87,7 +93,7 @@ public class PlayerController : MonoBehaviour
         if (godReferencePosition == null) Debug.LogError("God position reference missing");
 
         humanState = new HumanState(cameraRig, humanReferencePosition, humanReferenceFloor, 1, 1);
-        godState = new GodState(godReferencePosition, godReferenceFloor, godScale, godForceScale);
+        godState = new GodState(humanReferencePosition, godReferenceFloor, godScale, godForceScale);
         activeState = humanState;
         SetInventories();
         UpdateCamera(activeState);
@@ -101,17 +107,25 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    void SetGodFloorAndPosition()
+    void SetGodFloorAndPosition(Scene scene)
     {
         // Manually adjust the GodPositionReference and GodFloor dependent on the user's height
         Renderer godPositionRenderer = godReferencePosition.GetComponent<Renderer>();
+        if (!godPositionRenderer) godPositionRenderer = godReferencePosition.GetComponentInChildren<Renderer>();
         float godHeight = headPosition * 1.2f;
-        
+        float levelOffset = 0f;
+
         godReferencePosition.transform.localScale = new Vector3(godReferencePosition.transform.localScale.x, godReferencePosition.transform.localScale.y, godReferencePosition.transform.localScale.z * godHeight);
         float halfTableHeight = godPositionRenderer.bounds.size.y / 2;
 
-        godReferencePosition.transform.position = new Vector3(godReferencePosition.transform.position.x, humanReferenceFloor.transform.position.y - godPositionRenderer.bounds.center.y - halfTableHeight - 0.1f, godReferencePosition.transform.position.z);
-        godReferenceFloor.transform.position = new Vector3(godReferenceFloor.transform.position.x, godPositionRenderer.bounds.center.y - halfTableHeight, godReferenceFloor.transform.position.z);
+        if (scene.name == "Supermarket_01")
+        {   
+            levelOffset = 9.62f;
+        }
+        godReferencePosition.transform.position = new Vector3(godReferencePosition.transform.position.x, humanReferenceFloor.transform.position.y - godPositionRenderer.bounds.center.y - halfTableHeight - 0.1f - levelOffset, godReferencePosition.transform.position.z);
+        godReferenceFloor.transform.position = new Vector3(godReferenceFloor.transform.position.x, godPositionRenderer.bounds.center.y - halfTableHeight - levelOffset, godReferenceFloor.transform.position.z);
+
+        Destroy(GameObject.Find("ROOF"));
     }
 
     void Awake()

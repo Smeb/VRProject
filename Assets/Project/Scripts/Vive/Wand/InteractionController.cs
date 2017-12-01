@@ -9,6 +9,8 @@ public partial class WandController : Owner
     private HashSet<GameObject> hoveredContainers = new HashSet<GameObject>();
     private ContainerController closestContainer;
     private bool itemScaledDown;
+    // Item ownership mechanisms
+    private FixedJoint fixedJoint;
 
     [SerializeField]
     private GameObject m_closestItem;
@@ -35,8 +37,6 @@ public partial class WandController : Owner
             return m_closestItem;
         }
     }
-    // Item ownership mechanisms
-    private FixedJoint fixedJoint;
 
     void ScaleItemDown()
     {
@@ -57,12 +57,12 @@ public partial class WandController : Owner
 
             foreach (GameObject gameObject in hoveredInteractables)
             {
+                if (gameObject == null) continue; // Could happen if an item is checked out
                 distance = (gameObject.transform.position - transform.position).sqrMagnitude;
                 if (distance < minDistance)
                 {
                     minDistance = distance;
                     newClosestItem = gameObject;
-
                 }
             }
 
@@ -107,6 +107,7 @@ public partial class WandController : Owner
     {
         if (ownedItem == item)
         {
+            anchor.transform.localScale = new Vector3(1, 1, 1);
             fixedJoint.connectedBody = null;
             base.GiveUpObject(item);
         }
@@ -181,5 +182,4 @@ public partial class WandController : Owner
             textureMapping.references--;
         }
     }
-
 }

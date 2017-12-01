@@ -45,9 +45,9 @@ public class HandUIController : MonoBehaviour {
         }
     }
 
-    public void AddItem(int code)
+    public void AddItem(GameObject item)
     {
-        shoppingListPanel.AddItem(code);
+        shoppingListPanel.AddItem(item);
     }
 
     public void ScanModeToggle()
@@ -87,7 +87,8 @@ public class HandUIController : MonoBehaviour {
 
     void OnSceneLoad(Scene scene, LoadSceneMode mode)
     {
-        shoppingListPanel.ClearAll();
+        shoppingListPanel.gameObject.SetActive(true);
+        shoppingListPanel.OnSceneLoad();
     }
 
     void UpdatePlayerContainerVisibilities()
@@ -98,10 +99,8 @@ public class HandUIController : MonoBehaviour {
             {
                 container.ToggleVisibility(isVisible);
             }
-        }
-            
+        } 
     }
-
 
     void ToggleVisibility()
     {

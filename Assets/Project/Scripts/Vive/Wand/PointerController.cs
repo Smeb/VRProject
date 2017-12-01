@@ -7,7 +7,7 @@ using UnityEngine.UI;
 public partial class WandController : Owner
 {
     private Button button; // The selected button, if it exists
-    private ProductCode currentProduct;
+    private GameObject currentProduct;
 
     // Pointer specific scripts
     private LaserPointer pointer;
@@ -52,7 +52,7 @@ public partial class WandController : Owner
         ProductCode productTarget = target.GetComponent<ProductCode>();
         if (productTarget != null)
         {
-            currentProduct = productTarget;
+            currentProduct = target.gameObject;
         }
     }
 

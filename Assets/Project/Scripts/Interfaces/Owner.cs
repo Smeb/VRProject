@@ -21,6 +21,7 @@ public abstract class Owner : MonoBehaviour
                 if (m_ownedItem)
                 {
                     m_ownedItem.transform.parent = itemPreviousParent;
+                    m_ownedItem.transform.localScale = new Vector3(1, 1, 1);
                 }
 
                 if (value != null)
@@ -55,6 +56,7 @@ public abstract class Owner : MonoBehaviour
     {
         if (ownedItem == item)
         {
+            
             ownedItem = null;
         }
     }
