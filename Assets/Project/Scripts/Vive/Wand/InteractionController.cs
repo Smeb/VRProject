@@ -12,7 +12,7 @@ public partial class WandController : Owner
     // Item ownership mechanisms
     private FixedJoint fixedJoint;
 
-    [SerializeField]
+    private bool helpMode;
     private GameObject m_closestItem;
     private GameObject closestItem
     {

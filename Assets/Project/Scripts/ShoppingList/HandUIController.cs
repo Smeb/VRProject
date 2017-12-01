@@ -15,7 +15,8 @@ public class HandUIController : MonoBehaviour {
     private bool previousActiveState = true;
     private PlayerContainer[] containers;
 
-    public event Action ShoppingListOpen, ShoppingListClose, ScanModeOn, ScanModeOff;
+    public event ToggleEvent ToggleShoppingList;
+    public event ToggleEvent ToggleScanMode;
 
     void Awake ()
     {
@@ -54,17 +55,17 @@ public class HandUIController : MonoBehaviour {
     {
         if (scannerToggledOn)
         {
-            if (ScanModeOff != null)
+            if (ToggleScanMode != null)
             {
-                ScanModeOff();
+                ToggleScanMode(false);
             }
             scanModeText.text = "Enable Scan Mode";
         }
         else
         {
-            if (ScanModeOn != null)
+            if (ToggleScanMode != null)
             {
-                ScanModeOn();
+                ToggleScanMode(true);
             }
             scanModeText.text = "Disable Scan Mode";
         }
@@ -76,6 +77,8 @@ public class HandUIController : MonoBehaviour {
         SceneManager.sceneLoaded += OnSceneLoad;
         playerController.AddItem += AddItem;
         playerController.OnChangeState += OnChangeState;
+        shoppingListPanel.gameObject.SetActive(true);
+        shoppingListPanel.Initialise();
     }
 
     private void OnDisable()
@@ -88,7 +91,7 @@ public class HandUIController : MonoBehaviour {
     void OnSceneLoad(Scene scene, LoadSceneMode mode)
     {
         shoppingListPanel.gameObject.SetActive(true);
-        shoppingListPanel.OnSceneLoad();
+        shoppingListPanel.Initialise();
     }
 
     void UpdatePlayerContainerVisibilities()
@@ -106,13 +109,9 @@ public class HandUIController : MonoBehaviour {
     {
         if (isVisible != previousActiveState)
         {
-            if (isVisible && ShoppingListOpen != null)
+            if (ToggleShoppingList != null)
             {
-                ShoppingListOpen();
-            }
-            else if (!isVisible && ShoppingListClose != null)
-            {
-                ShoppingListClose();
+                ToggleShoppingList(isVisible);
             }
 
             foreach (Collider c in GetComponents<Collider>())

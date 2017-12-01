@@ -5,27 +5,18 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public delegate void AddItemDelegate(GameObject item);
+public delegate void ToggleEvent(bool state);
 
 public class PlayerController : MonoBehaviour
 {
     public GameObject cameraRig;
-    public event Action ShoppingListOpen, ShoppingListClose;
-    public event Action ScanModeOn, ScanModeOff;
+    private SteamVR_Camera camera;
+    public event ToggleEvent ToggleHelpMode, ToggleScanMode, ToggleShoppingList;
     public event AddItemDelegate AddItem;
-
-    public void OnAddItem(GameObject item)
-    {
-        if (AddItem != null)
-        {
-            AddItem(item);
-        }
-    }
-
-    public void OnDestroy()
-    {
-        Debug.Log("Destroy attempted");
-    }
-
+    private bool helpModeToggledOn = true;
+    public delegate void ChangeState(CameraState newState);
+    public event ChangeState OnChangeState;
+    
     public GameObject playerBody;
     public ContainerController[] inventories;
     
@@ -45,9 +36,6 @@ public class PlayerController : MonoBehaviour
     private CameraState humanState, godState;
     private CameraState m_activeState;
     private int touchpadIndex = -1;
-
-    public delegate void ChangeState(CameraState newState);
-    public event ChangeState OnChangeState;
 
     public CameraState activeState
     {
@@ -70,7 +58,25 @@ public class PlayerController : MonoBehaviour
                 }
 
                 UpdateCamera(m_activeState);
+                velocity = 0;
+                lastPosition = camera.head.position;
             }
+        }
+    }
+
+    public void OnAddItem(GameObject item)
+    {
+        if (AddItem != null)
+        {
+            AddItem(item);
+        }
+    }
+
+    public void OnToggleHelpMode(bool newState)
+    {
+        if (ToggleHelpMode != null)
+        {
+            ToggleHelpMode(newState);
         }
     }
 
@@ -123,32 +129,30 @@ public class PlayerController : MonoBehaviour
             levelOffset = 9.62f;
         }
         godReferencePosition.transform.position = new Vector3(godReferencePosition.transform.position.x, humanReferenceFloor.transform.position.y - godPositionRenderer.bounds.center.y - halfTableHeight - 0.1f - levelOffset, godReferencePosition.transform.position.z);
-        godReferenceFloor.transform.position = new Vector3(godReferenceFloor.transform.position.x, godPositionRenderer.bounds.center.y - halfTableHeight - levelOffset, godReferenceFloor.transform.position.z);
-
-        Destroy(GameObject.Find("ROOF"));
+        godReferenceFloor.transform.position = new Vector3(godReferenceFloor.transform.position.x, godPositionRenderer.bounds.center.y - halfTableHeight, godReferenceFloor.transform.position.z);
     }
 
     void Awake()
     {
+        camera = cameraRig.GetComponentInChildren<SteamVR_Camera>();
         SceneManager.sceneLoaded += OnSceneLoad;
         inventories = GetComponentsInChildren<PlayerContainer>();
     }
 
     private void Update()
     {
-        SteamVR_Camera camera = cameraRig.GetComponentInChildren<SteamVR_Camera>();
-        
         // TODO: Adjust for forceScale parameter when moving user
         if (locomotion == "walk-in-place" &&
             activeTouchpadController &&
             camera.head.localPosition.y > headPosition - headOffset)
         {
             float yChange = camera.head.localPosition.y - lastPosition.y;
-            float desiredVelocity = Time.deltaTime > 0 ? (Mathf.Abs(yChange)) * 5 / Time.deltaTime : 0;
-            velocity = Mathf.Lerp(velocity, desiredVelocity, Time.deltaTime * 5) * activeState.forceScale;
+            float desiredVelocity = Time.deltaTime > 0 ? (Mathf.Abs(yChange)) * 5 * activeState.forceScale / Time.deltaTime : 0;
+            velocity = Mathf.Lerp(velocity, desiredVelocity, Time.deltaTime * 5);
             Vector3 moveDirection = activeTouchpadController.transform.rotation * Vector3.forward;
             moveDirection = new Vector3(moveDirection.x, 0, moveDirection.z).normalized;
             Vector3 move = moveDirection * velocity * Time.deltaTime;
+            Debug.Log(move);
             cameraRig.transform.position += move;
         }
 
@@ -164,10 +168,8 @@ public class PlayerController : MonoBehaviour
         HandUIController handUIController = controller.GetComponentInChildren<HandUIController>();
         if (handUIController)
         {
-            handUIController.ShoppingListOpen += OnShoppingListOpen;
-            handUIController.ShoppingListClose += OnShoppingListClose;
-            handUIController.ScanModeOn += OnScanModeOn;
-            handUIController.ScanModeOff += OnScanModeOff;
+            handUIController.ToggleShoppingList += OnToggleShoppingList;
+            handUIController.ToggleScanMode += OnToggleScanMode;
         }
     }
 
@@ -180,45 +182,27 @@ public class PlayerController : MonoBehaviour
         HandUIController handUIController = controller.GetComponentInChildren<HandUIController>();
         if (handUIController)
         {
-            handUIController.ShoppingListOpen -= OnShoppingListOpen;
-            handUIController.ShoppingListClose -= OnShoppingListClose;
-            handUIController.ScanModeOn -= OnScanModeOn;
-            handUIController.ScanModeOff -= OnScanModeOff;
+            handUIController.ToggleShoppingList -= OnToggleShoppingList;
+            handUIController.ToggleScanMode -= OnToggleScanMode;
         }
     }
 
-    private void OnShoppingListOpen()
+    private void OnToggleShoppingList(bool newState)
     {
-        if (ShoppingListOpen != null)
+        if (ToggleShoppingList != null)
         {
-            ShoppingListOpen();
+            ToggleShoppingList(newState);
         }
     }
-
-    private void OnShoppingListClose()
+   
+    private void OnToggleScanMode(bool newState)
     {
-        if (ShoppingListClose != null)
+        if (ToggleScanMode != null)
         {
-            ShoppingListClose();
+            ToggleScanMode(newState);
         }
     }
-
-    private void OnScanModeOn()
-    {
-        if (ScanModeOn != null)
-        {
-            ScanModeOn();
-        }
-    }
-
-    private void OnScanModeOff()
-    {
-        if (ScanModeOff != null)
-        {
-            ScanModeOff();
-        }
-    }
-
+    
     private void TouchpadUpdateHandler(WandController controller)
     {
         if (activeTouchpadController == controller && locomotion == "touchpad")
@@ -269,13 +253,16 @@ public class PlayerController : MonoBehaviour
 
     public void ToggleViewpoint()
     {
-        if (activeState == humanState)
+        if (!activeTouchpadController)
         {
-            activeState = godState;
-        }
-        else
-        {
-            activeState = humanState;
+            if (activeState == humanState)
+            {
+                activeState = godState;
+            }
+            else
+            {
+                activeState = humanState;
+            }
         }
     }
 

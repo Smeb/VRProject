@@ -23,13 +23,17 @@ public class ShoppingListItemCollection : MonoBehaviour {
         slots = this.GetComponentsInChildren<ShoppingListItem>();
         iconMap = new IconMap();
 
-        itemChecker = new ItemChecker(experiment.ItemsToCollect);
-    }
 
-    public void OnSceneLoad()
+    }
+    
+    public void Initialise()
     {
         experiment = GameObject.Find("Checkout").GetComponent<UCL.COMPGV07.Experiment>();
         this.ClearAll();
+        if (experiment)
+        {
+            itemChecker = new ItemChecker(experiment.ItemsToCollect);
+        }
     }
 
     public void ClearAll()
@@ -70,7 +74,6 @@ public class ShoppingListItemCollection : MonoBehaviour {
         }
 	}
 }
-
 
 public class ItemChecker{
 

@@ -26,12 +26,4 @@ public partial class WandController : Owner
             playerController.ToggleViewpoint();
         }
     }
-
-    public void HumanStateChangeHandler()
-    {
-        if (ownedItem)
-        {
-            ThrowObject();
-        }
-    }
 }

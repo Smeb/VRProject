@@ -59,12 +59,12 @@ public partial class WandController : Owner
             pointer.PointerIn += OnPointerEnter;
             pointer.PointerOut += OnPointerExit;
 
-            playerController.ShoppingListOpen += OnShoppingListOpen;
-            playerController.ShoppingListClose += OnShoppingListClose;
-            playerController.ScanModeOn += OnScanModeOn;
-            playerController.ScanModeOff += OnScanModeOff;
+            playerController.ToggleShoppingList += OnShoppingListToggle;
+            playerController.ToggleScanMode += OnScanModeToggle;
         }
+
         playerController.OnChangeState += ChangeStateHandler;
+        playerController.ToggleHelpMode += OnHelpModeToggle;
         playerController.RegisterWand(this);
     }
 
@@ -75,24 +75,24 @@ public partial class WandController : Owner
             pointer.PointerIn -= OnPointerEnter;
             pointer.PointerOut -= OnPointerExit;
 
-            playerController.ShoppingListOpen -= OnShoppingListOpen;
-            playerController.ShoppingListClose-= OnShoppingListClose;
-            playerController.ScanModeOn -= OnScanModeOn;
-            playerController.ScanModeOff -= OnScanModeOff;
+            playerController.ToggleShoppingList -= OnShoppingListToggle;
+            playerController.ToggleScanMode -= OnScanModeToggle;
         }
         playerController.OnChangeState -= ChangeStateHandler;
+        playerController.ToggleHelpMode-= OnHelpModeToggle;
         playerController.DeregisterWand(this);
+    }
+
+    private void OnHelpModeToggle(bool newState)
+    {
+        helpMode = newState;
     }
 
     private void ChangeStateHandler(CameraState state)
     {
-        if (state is HumanState)
+        if (ownedItem)
         {
-            HumanStateChangeHandler();
-        }
-        else if (state is CameraState)
-        {
-            GodStateChangeHandler();
+            ThrowObject();
         }
     }
 

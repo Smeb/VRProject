@@ -16,28 +16,17 @@ public partial class WandController : Owner
     [SerializeField] private bool shoppingListOpen = false;
     private bool scanModeOn = false;
 
-    private void OnShoppingListOpen()
+    private void OnShoppingListToggle(bool newState)
     {
-        shoppingListOpen = true;
+        shoppingListOpen = newState;
     }
 
-    private void OnShoppingListClose()
+    private void OnScanModeToggle(bool state)
     {
-        shoppingListOpen = false;
-    }
-
-    private void OnScanModeOn()
-    {
-        scanModeOn = true;
+        scanModeOn = state;
         pointer.ScanModeToggle(scanModeOn);
     }
-
-    private void OnScanModeOff()
-    {
-        scanModeOn = false;
-        pointer.ScanModeToggle(scanModeOn);
-    }
-
+    
     public void OnPointerEnter(object sender, Transform target)
     {
         Button buttonTarget = target.GetComponent<Button>();

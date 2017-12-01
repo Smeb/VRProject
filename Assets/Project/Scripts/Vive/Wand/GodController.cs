@@ -34,12 +34,4 @@ public partial class WandController : Owner
             }
         }
     }
-
-    public void GodStateChangeHandler()
-    {
-        if(ownedItem)
-        {
-            ThrowObject();
-        }
-    }
 }
