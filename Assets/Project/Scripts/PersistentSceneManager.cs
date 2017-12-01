@@ -20,6 +20,14 @@ public class PersistentSceneManager : MonoBehaviour {
         TextureController.supermarketHighlight = supermarketHighlight;
 	}
 
+    public void OnApplicationQuit()
+    {
+        if (previousScene == "Tutorial")
+        {
+            Application.CancelQuit();
+        }
+    }
+
     public void LoadLevel (string name)
     {
          StartCoroutine(LoadSceneAsync(name));

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace UCL.COMPGV07 {
-
     [RequireComponent(typeof(AudioSource))]
     [RequireComponent(typeof(BoxCollider))]
     public class Checkout : MonoBehaviour {

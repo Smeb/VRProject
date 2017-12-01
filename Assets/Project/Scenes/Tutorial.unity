@@ -6876,7 +6876,6 @@ GameObject:
   - component: {fileID: 929593290}
   - component: {fileID: 929593289}
   - component: {fileID: 929593288}
-  - component: {fileID: 929593287}
   m_Layer: 0
   m_Name: Checkout
   m_TagString: Untagged
@@ -6884,20 +6883,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &929593287
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 929593286}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1e8a979e78abf1547b20db1e70ef88b9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Head: {fileID: 0}
-  Playspace: {fileID: 0}
-  GroupNumber: 9
 --- !u!114 &929593288
 MonoBehaviour:
   m_ObjectHideFlags: 0

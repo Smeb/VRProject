@@ -10,10 +10,8 @@ namespace UCL.COMPGV07
         public TextAsset ConfigAsset;
 
         // Use this for initialization
-        new void Start()
+        new void Awake()
         {
-            base.Start();
-
             Load(new MemoryStream(ConfigAsset.bytes));
         }
     }

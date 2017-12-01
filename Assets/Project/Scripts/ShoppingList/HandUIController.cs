@@ -17,7 +17,11 @@ public class HandUIController : MonoBehaviour {
     private bool isVisible;
     private bool scannerOnline;
     private bool previousActiveState = true;
+    private bool initialiseShoppingList = false;
+
+    public HashSet<GameObject> addedItems;
     private PlayerContainer[] containers;
+    [SerializeField] public HashSet<GameObject> containedItems = new HashSet<GameObject>();
 
     public event ToggleEvent ToggleShoppingList;
     public event ToggleEvent ToggleScanMode;
@@ -69,6 +73,7 @@ public class HandUIController : MonoBehaviour {
 
     public void AddItem(GameObject item)
     {
+        addedItems.Add(item);
         ToggleCameraScanner(true);
         shoppingListPanel.AddItem(item);
     }
@@ -99,9 +104,13 @@ public class HandUIController : MonoBehaviour {
         SceneManager.sceneLoaded += OnSceneLoad;
         playerController.AddItem += AddItem;
         playerController.OnChangeState += OnChangeState;
-        shoppingListPanel.gameObject.SetActive(true);
-        shoppingListPanel.Initialise();
+        initialiseShoppingList = true;
         scanStatusMessage.SetActive(true);
+        foreach (PlayerContainer container in containers)
+        {
+            container.AddItem += OnContainerAddItem;
+            container.RemoveItem += OnContainerRemoveItem;
+        }
     }
 
     private void OnDisable()
@@ -109,13 +118,28 @@ public class HandUIController : MonoBehaviour {
         SceneManager.sceneLoaded -= OnSceneLoad;
         playerController.AddItem -= AddItem;
         playerController.OnChangeState -= OnChangeState;
+        foreach (PlayerContainer container in containers)
+        {
+            container.AddItem -= OnContainerAddItem;
+            container.RemoveItem -= OnContainerRemoveItem;
+        }
+    }
+
+    public void OnContainerAddItem(GameObject item)
+    {
+        containedItems.Add(item);
+    }
+
+    public void OnContainerRemoveItem(GameObject item)
+    {
+        containedItems.Remove(item);
     }
 
     void OnSceneLoad(Scene scene, LoadSceneMode mode)
     {
+        addedItems = new HashSet<GameObject>();
         ToggleCameraScanner(false);
-        shoppingListPanel.gameObject.SetActive(true);
-        shoppingListPanel.Initialise();
+        initialiseShoppingList = true;
     }
 
     void UpdatePlayerContainerVisibilities()
@@ -131,6 +155,13 @@ public class HandUIController : MonoBehaviour {
 
     void ToggleVisibility()
     {
+        if (initialiseShoppingList)
+        {
+            shoppingListPanel.gameObject.SetActive(true);
+            shoppingListPanel.Initialise();
+            initialiseShoppingList = false;
+        }
+
         if (isVisible != previousActiveState)
         {
             if (ToggleShoppingList != null)

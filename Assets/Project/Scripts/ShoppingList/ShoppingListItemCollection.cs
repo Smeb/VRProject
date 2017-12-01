@@ -7,13 +7,13 @@ using UnityEngine.SceneManagement;
 public class ShoppingListItemCollection : MonoBehaviour {
 	public Transform itemsParent;
 
-
 	[SerializeField] public ShoppingListItem[] slots;
     private int freeSlotIndex = 0;
 	public IconMap iconMap;
 	public GameObject BGPanel;
     public Material markerMaterial;
 	public bool active;
+    private HashSet<GameObject> spawnedItemCopy = new HashSet<GameObject>();
 
     public UCL.COMPGV07.Experiment experiment;
 
@@ -27,16 +27,28 @@ public class ShoppingListItemCollection : MonoBehaviour {
     
     public void Initialise()
     {
-        experiment = GameObject.Find("Checkout").GetComponent<UCL.COMPGV07.Experiment>();
+        GameObject experimentGameObject = GameObject.Find("Checkout");
+        if (experimentGameObject)
+        {
+            experiment = experimentGameObject.GetComponent<UCL.COMPGV07.Experiment>();
+        }
+        
         this.ClearAll();
         if (experiment)
         {
+            Debug.Log(experiment.ItemsToCollect.Length);
             itemChecker = new ItemChecker(experiment.ItemsToCollect);
+
+            foreach(GameObject spawnedItem in experiment.spawnedItems)
+            {
+                spawnedItemCopy.Add(spawnedItem);
+            }
         }
     }
 
     public void ClearAll()
     {
+        experiment = null;
         for (int i = 0; i < slots.Length; i++)
         {
             slots[i].ClearItem();
@@ -53,11 +65,16 @@ public class ShoppingListItemCollection : MonoBehaviour {
         }
     }
 
+    public int QueryAddedItems()
+    {
+        return freeSlotIndex;
+    }
+
 	public void AddItem(GameObject item){
-        experiment.spawnedItems.Remove(item);
+        spawnedItemCopy.Remove(item);
         int code = item.GetComponent<ProductCode>().Code;
 
-        foreach (GameObject spawnedItem in experiment.spawnedItems)
+        foreach (GameObject spawnedItem in spawnedItemCopy)
         {
             if (spawnedItem.GetComponent<ProductCode>().Code == code)
             {
@@ -84,10 +101,7 @@ public class ItemChecker{
 	private Dictionary<int, int> itemCollection;
 
 	public ItemChecker(int[] itemsToCollect) {
-
-
 		for (int i = 0; i < itemsToCollect.Length; i++){
-
 			bool hasKey = itemCollection.ContainsKey (itemCollection [i]);
 
 			int existingCount = hasKey ? itemCollection[itemsToCollect[i]] : 0; 

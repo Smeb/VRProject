@@ -42,9 +42,9 @@
     <Spawn>
       <Product>51</Product>
       <Position>
-        <x>10.24</x>
-        <y>1.03098059</y>
-        <z>-6.2092557</z>
+        <x>2.175</x>
+        <y>10.068</y>
+        <z>-4.135</z>
       </Position>
       <Rotation>
         <x>0</x>
@@ -58,22 +58,22 @@
         </eulerAngles>
       </Rotation>
     </Spawn>
-  
+
     <Spawn>
       <Product>49</Product>
       <Position>
-        <x>-7.933</x>
-        <y>1.588</y>
-        <z>-13.309</z>
+        <x>6.8989</x>
+        <y>10.664</y>
+        <z>6.1774</z>
       </Position>
       <Rotation>
         <x>0</x>
-        <y>-0.8645132</y>
+        <y>-0.5150808</y>
         <z>0</z>
-        <w>0.5026102</w>
+        <w>0.8571417</w>
         <eulerAngles>
           <x>0</x>
-          <y>240.345673</y>
+          <y>297.9943</y>
           <z>0</z>
         </eulerAngles>
       </Rotation>
@@ -81,18 +81,18 @@
     <Spawn>
       <Product>56</Product>
       <Position>
-        <x>-4.461</x>
-        <y>0.612</y>
-        <z>-50.428</z>
+        <x>1.92</x>
+        <y>9.28774</y>
+        <z>-5.260015</z>
       </Position>
       <Rotation>
         <x>0</x>
-        <y>0.190119877</y>
+        <y>0</y>
         <z>0</z>
-        <w>0.9817609</w>
+        <w>1</w>
         <eulerAngles>
           <x>0</x>
-          <y>21.9195614</y>
+          <y>0</y>
           <z>0</z>
         </eulerAngles>
       </Rotation>
@@ -100,18 +100,18 @@
     <Spawn>
       <Product>51</Product>
       <Position>
-        <x>-1.85</x>
-        <y>1.147</y>
-        <z>-17.505</z>
+        <x>-4.629</x>
+        <y>10.664</y>
+        <z>6.1774</z>
       </Position>
       <Rotation>
         <x>0</x>
-        <y>-0.0141516812</y>
+        <y>-0.7054352</y>
         <z>0</z>
-        <w>0.9998999</w>
+        <w>0.7087745</w>
         <eulerAngles>
           <x>0</x>
-          <y>358.3783</y>
+          <y>270.270569</y>
           <z>0</z>
         </eulerAngles>
       </Rotation>

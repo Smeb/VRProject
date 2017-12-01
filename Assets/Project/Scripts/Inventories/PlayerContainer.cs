@@ -5,6 +5,10 @@ using UnityEngine;
 public class PlayerContainer : ContainerController {
     public HashSet<WandController> triggeringObjects = new HashSet<WandController>();
 
+    public delegate void ItemUpdate(GameObject item);
+    public ItemUpdate RemoveItem;
+    public ItemUpdate AddItem;
+
     public void ToggleVisibility(bool toggle)
     {
         GetComponent<Collider>().enabled = toggle;
@@ -27,6 +31,26 @@ public class PlayerContainer : ContainerController {
             }
         }
 
+    }
+
+    protected override void TakeOwnership(Property item)
+    {
+        if (AddItem != null)
+        {
+            AddItem(item.gameObject);
+        }
+        
+        base.TakeOwnership(item);
+    }
+
+    public override void GiveUpObject(Property item)
+    {
+        if (RemoveItem != null)
+        {
+            RemoveItem(item.gameObject);
+        }
+
+        base.GiveUpObject(item);
     }
 
     public void OnTriggerEnter(Collider other)
